@@ -15,12 +15,19 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 3000;
 
-// ─────────────────────────────────────────────
-//  WORD POOL  (5 topics, each 4×4 = 16 words)
-// ─────────────────────────────────────────────
+// Ensure UTF-8 charset on all responses
+app.use((req, res, next) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  next();
+});
+
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+//  WORD POOL  (12 topics, each 4Ã—4 = 16 words)
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const TOPICS = [
   {
     name: 'Animals',
+    emoji: 'ğŸ¾',
     words: [
       ['Lion',    'Tiger',   'Elephant', 'Giraffe'],
       ['Penguin', 'Dolphin', 'Eagle',    'Shark'],
@@ -30,6 +37,7 @@ const TOPICS = [
   },
   {
     name: 'Food & Drink',
+    emoji: 'ğŸ•',
     words: [
       ['Pizza',   'Sushi',   'Tacos',    'Burger'],
       ['Ramen',   'Steak',   'Lobster',  'Spaghetti'],
@@ -39,6 +47,7 @@ const TOPICS = [
   },
   {
     name: 'Countries',
+    emoji: 'ğŸŒ',
     words: [
       ['Japan',   'Brazil',  'Germany',  'Egypt'],
       ['Canada',  'India',   'Argentina','Nigeria'],
@@ -48,6 +57,7 @@ const TOPICS = [
   },
   {
     name: 'Movies',
+    emoji: 'ğŸ¬',
     words: [
       ['Inception','Avatar',   'Titanic',  'Gladiator'],
       ['Parasite', 'Interstellar','Joker', 'Frozen'],
@@ -57,6 +67,7 @@ const TOPICS = [
   },
   {
     name: 'Sports',
+    emoji: 'âš½',
     words: [
       ['Football', 'Basketball','Tennis',  'Swimming'],
       ['Baseball', 'Volleyball','Golf',    'Boxing'],
@@ -66,6 +77,7 @@ const TOPICS = [
   },
   {
     name: 'Superheroes',
+    emoji: 'ğŸ¦¸',
     words: [
       ['Superman', 'Batman',   'Spider-Man','Wonder Woman'],
       ['Iron Man', 'Thor',     'Hulk',      'Captain America'],
@@ -75,23 +87,74 @@ const TOPICS = [
   },
   {
     name: 'Musical Instruments',
+    emoji: 'ğŸ¸',
     words: [
       ['Guitar',   'Piano',    'Violin',   'Drums'],
       ['Trumpet',  'Flute',    'Cello',    'Saxophone'],
       ['Harp',     'Clarinet', 'Trombone', 'Ukulele'],
-      ['Banjo',    'Accordion', 'Oboe',    'Marimba'],
+      ['Banjo',    'Accordion','Oboe',     'Marimba'],
+    ],
+  },
+  {
+    name: 'Cities',
+    emoji: 'ğŸ™ï¸',
+    words: [
+      ['Tokyo',    'Paris',   'New York', 'London'],
+      ['Dubai',    'Sydney',  'Istanbul', 'Rome'],
+      ['Barcelona','Berlin',  'Cairo',    'Mumbai'],
+      ['Bangkok',  'Toronto', 'Madrid',   'Singapore'],
+    ],
+  },
+  {
+    name: 'Video Games',
+    emoji: 'ğŸ®',
+    words: [
+      ['Minecraft','Fortnite', 'Roblox',    'FIFA'],
+      ['GTA',      'Zelda',    'PokÃ©mon',   'Halo'],
+      ['Valorant', 'Among Us', 'Elden Ring','Tetris'],
+      ['Mario',    'Doom',     'Cyberpunk', 'Sims'],
+    ],
+  },
+  {
+    name: 'Fashion Brands',
+    emoji: 'ğŸ‘—',
+    words: [
+      ['Nike',    'Gucci',   'Zara',    'Adidas'],
+      ['Prada',   'H&M',     'Chanel',  'Versace'],
+      ['Balenciaga','Louis Vuitton','Dior','Supreme'],
+      ['Off-White','Fendi',  'Burberry','Givenchy'],
+    ],
+  },
+  {
+    name: 'Science',
+    emoji: 'ğŸ§ª',
+    words: [
+      ['Gravity',  'Atom',    'DNA',     'Laser'],
+      ['Quantum',  'Plasma',  'Neuron',  'Enzyme'],
+      ['Eclipse',  'Fossil',  'Vaccine', 'Magnet'],
+      ['Proton',   'Photon',  'Crystal', 'Comet'],
+    ],
+  },
+  {
+    name: 'Things at a Party',
+    emoji: 'ğŸ‰',
+    words: [
+      ['Balloons', 'Confetti','DJ',      'Dance Floor'],
+      ['Cocktails','Karaoke', 'Streamers','Birthday Cake'],
+      ['Snapchat', 'Glitter', 'Fireworks','Photo Booth'],
+      ['Playlist', 'Bouncer', 'Selfie',  'After Party'],
     ],
   },
 ];
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  IN-MEMORY STATE
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const rooms = new Map();
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  HELPERS
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function generateRoomCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
   let code;
@@ -138,16 +201,29 @@ function roomPublicState(room) {
     players,
     roundNumber: room.roundNumber,
     topic: room.topic ? room.topic.name : null,
+    topicEmoji: room.topic ? room.topic.emoji : null,
     grid: room.topic ? room.topic.words : null,
     turnOrder: room.turnOrder,
     currentTurnIndex: room.currentTurnIndex,
     clues: room.clues ? Object.fromEntries(room.clues) : {},
     votes: room.votes ? Object.fromEntries(room.votes) : {},
+    devMode: room.devMode || false,
   };
 }
 
 function privatePlayerInfo(room, socketId) {
   const isChameleon = room.chameleonId === socketId;
+  // In dev mode, reveal everything to everyone
+  if (room.devMode) {
+    return {
+      role: isChameleon ? 'chameleon' : 'innocent',
+      secretCoord: room.secretCoord,
+      secretWord: room.secretWord,
+      chameleonId: room.chameleonId,
+      devMode: true,
+      allTopics: TOPICS.map(t => t.name),
+    };
+  }
   return {
     role: isChameleon ? 'chameleon' : 'innocent',
     secretCoord: isChameleon ? null : room.secretCoord,
@@ -175,9 +251,9 @@ function cleanupRoom(roomCode) {
   console.log(`[Room ${roomCode}] Cleaned up.`);
 }
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  GAME LOGIC
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function startRound(room) {
   const topic = pickRandom(TOPICS);
   const row = Math.floor(Math.random() * 4);
@@ -186,7 +262,6 @@ function startRound(room) {
 
   const connected = getConnectedPlayers(room);
   const chameleon = pickRandom(connected);
-
   const turnOrder = shuffle(connected.map((p) => p.id));
 
   room.topic = topic;
@@ -202,7 +277,7 @@ function startRound(room) {
   if (room.guessTimer) { clearTimeout(room.guessTimer); room.guessTimer = null; }
 
   console.log(
-    `[Room ${room.code}] Round ${room.roundNumber} started. Topic: ${topic.name}, Secret: ${secretWord} (${room.secretCoord.label}), Chameleon: ${chameleon.username}`
+    `[Room ${room.code}]${room.devMode ? ' [DEV]' : ''} Round ${room.roundNumber} started. Topic: ${topic.name}, Secret: ${secretWord} (${room.secretCoord.label}), Chameleon: ${chameleon.username}`
   );
 
   broadcastRoomState(room);
@@ -266,10 +341,6 @@ function resolveVoting(room) {
   }
 
   const chameleonCaught = votedOutId === room.chameleonId;
-
-  console.log(
-    `[Room ${room.code}] Voting resolved. VotedOut: ${votedOutId}, Chameleon: ${room.chameleonId}, Caught: ${chameleonCaught}`
-  );
 
   if (!chameleonCaught) {
     room.phase = 'reveal';
@@ -352,10 +423,6 @@ function resolveGuess(room, guess) {
     correct,
     scores: Object.fromEntries(room.scores),
   });
-
-  console.log(
-    `[Room ${room.code}] Round resolved. Guess: "${guess}", Correct: ${correct}, Result: ${chameleonWins ? 'chameleon_wins' : 'innocents_win'}`
-  );
 }
 
 function addScore(room, playerId, points) {
@@ -378,13 +445,14 @@ function resetToLobby(room) {
   io.to(room.code).emit('phase_change', { phase: 'lobby' });
 }
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  SOCKET EVENT HANDLERS
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 io.on('connection', (socket) => {
   console.log(`[Socket] Connected: ${socket.id}`);
 
-  socket.on('create_room', ({ username }, callback) => {
+  // â”€â”€ CREATE ROOM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  socket.on('create_room', ({ username, devMode }, callback) => {
     if (!username || username.trim().length < 1) {
       return callback({ error: 'Username is required.' });
     }
@@ -407,6 +475,7 @@ io.on('connection', (socket) => {
       guessTimer: null,
       roundNumber: 0,
       scores: new Map(),
+      devMode: devMode === true,
     };
 
     room.players.set(socket.id, {
@@ -423,11 +492,12 @@ io.on('connection', (socket) => {
     socket.data.roomCode = code;
     socket.data.username = name;
 
-    console.log(`[Room ${code}] Created by ${name} (${socket.id})`);
-    callback({ success: true, roomCode: code, playerId: socket.id });
+    console.log(`[Room ${code}]${room.devMode ? ' [DEV]' : ''} Created by ${name} (${socket.id})`);
+    callback({ success: true, roomCode: code, playerId: socket.id, devMode: room.devMode });
     broadcastRoomState(room);
   });
 
+  // â”€â”€ JOIN ROOM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   socket.on('join_room', ({ username, roomCode }, callback) => {
     if (!username || username.trim().length < 1) {
       return callback({ error: 'Username is required.' });
@@ -459,11 +529,12 @@ io.on('connection', (socket) => {
     socket.data.username = name;
 
     console.log(`[Room ${code}] ${name} (${socket.id}) joined.`);
-    callback({ success: true, roomCode: code, playerId: socket.id });
+    callback({ success: true, roomCode: code, playerId: socket.id, devMode: room.devMode });
     broadcastRoomState(room);
     io.to(code).emit('player_joined', { username: name });
   });
 
+  // â”€â”€ TOGGLE READY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   socket.on('toggle_ready', () => {
     const room = rooms.get(socket.data.roomCode);
     if (!room || room.phase !== 'lobby') return;
@@ -473,11 +544,19 @@ io.on('connection', (socket) => {
     broadcastRoomState(room);
   });
 
+  // â”€â”€ START GAME (host only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   socket.on('start_game', (callback) => {
     const cb = typeof callback === 'function' ? callback : () => {};
     const room = rooms.get(socket.data.roomCode);
     if (!room) return cb({ error: 'Room not found.' });
     if (room.hostId !== socket.id) return cb({ error: 'Only the host can start the game.' });
+
+    if (room.devMode) {
+      // Dev mode: no player count or ready requirement
+      startRound(room);
+      return cb({ success: true });
+    }
+
     const connected = getConnectedPlayers(room);
     if (connected.length < 3) return cb({ error: 'Need at least 3 players to start.' });
     const notReady = connected.filter((p) => !p.ready && p.id !== room.hostId);
@@ -487,6 +566,45 @@ io.on('connection', (socket) => {
     cb({ success: true });
   });
 
+  // â”€â”€ DEV: SKIP TURN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  socket.on('dev_skip_turn', (callback) => {
+    const cb = typeof callback === 'function' ? callback : () => {};
+    const room = rooms.get(socket.data.roomCode);
+    if (!room || !room.devMode) return cb({ error: 'Not in dev mode.' });
+    if (room.phase !== 'describing') return cb({ error: 'Not in describing phase.' });
+
+    const currentId = room.turnOrder[room.currentTurnIndex];
+    const fakeClues = ['Interesting', 'Unique', 'Special', 'Obvious', 'Hmm', 'Definitely', 'Classic', 'Common'];
+    const fakeClue = pickRandom(fakeClues);
+    room.clues.set(currentId, fakeClue);
+    broadcastRoomState(room);
+    cb({ success: true, clue: fakeClue });
+    advanceTurn(room);
+  });
+
+  // â”€â”€ DEV: AUTO VOTE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  socket.on('dev_auto_vote', (callback) => {
+    const cb = typeof callback === 'function' ? callback : () => {};
+    const room = rooms.get(socket.data.roomCode);
+    if (!room || !room.devMode) return cb({ error: 'Not in dev mode.' });
+    if (room.phase !== 'voting') return cb({ error: 'Not in voting phase.' });
+
+    // Everyone votes randomly for someone else
+    const connected = getConnectedPlayers(room);
+    for (const player of connected) {
+      if (!room.votes.has(player.id)) {
+        const others = connected.filter(p => p.id !== player.id);
+        if (others.length > 0) {
+          room.votes.set(player.id, pickRandom(others).id);
+        }
+      }
+    }
+    broadcastRoomState(room);
+    cb({ success: true });
+    checkVotingComplete(room);
+  });
+
+  // â”€â”€ SUBMIT CLUE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   socket.on('submit_clue', ({ clue }, callback) => {
     const cb = typeof callback === 'function' ? callback : () => {};
     const room = rooms.get(socket.data.roomCode);
@@ -503,6 +621,7 @@ io.on('connection', (socket) => {
     advanceTurn(room);
   });
 
+  // â”€â”€ SUBMIT VOTE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   socket.on('submit_vote', ({ suspectId }, callback) => {
     const cb = typeof callback === 'function' ? callback : () => {};
     const room = rooms.get(socket.data.roomCode);
@@ -521,6 +640,7 @@ io.on('connection', (socket) => {
     checkVotingComplete(room);
   });
 
+  // â”€â”€ CHAMELEON GUESS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   socket.on('chameleon_guess', ({ guess }, callback) => {
     const cb = typeof callback === 'function' ? callback : () => {};
     const room = rooms.get(socket.data.roomCode);
@@ -532,6 +652,7 @@ io.on('connection', (socket) => {
     resolveGuess(room, guess.trim());
   });
 
+  // â”€â”€ PLAY AGAIN (host only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   socket.on('play_again', (callback) => {
     const cb = typeof callback === 'function' ? callback : () => {};
     const room = rooms.get(socket.data.roomCode);
@@ -540,11 +661,11 @@ io.on('connection', (socket) => {
     if (!['reveal', 'chameleon_guess'].includes(room.phase)) {
       return cb({ error: 'Game not finished yet.' });
     }
-
     resetToLobby(room);
     cb({ success: true });
   });
 
+  // â”€â”€ KICK PLAYER (host only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   socket.on('kick_player', ({ playerId }, callback) => {
     const cb = typeof callback === 'function' ? callback : () => {};
     const room = rooms.get(socket.data.roomCode);
@@ -568,6 +689,7 @@ io.on('connection', (socket) => {
     cb({ success: true });
   });
 
+  // â”€â”€ SEND CHAT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   socket.on('send_chat', ({ message }) => {
     const room = rooms.get(socket.data.roomCode);
     if (!room) return;
@@ -583,6 +705,7 @@ io.on('connection', (socket) => {
     });
   });
 
+  // â”€â”€ DISCONNECT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   socket.on('disconnect', (reason) => {
     console.log(`[Socket] Disconnected: ${socket.id} (${reason})`);
     const roomCode = socket.data.roomCode;
@@ -622,7 +745,7 @@ io.on('connection', (socket) => {
           }
 
           const connected = getConnectedPlayers(room);
-          if (room.phase !== 'lobby' && connected.length < 2) {
+          if (room.phase !== 'lobby' && !room.devMode && connected.length < 2) {
             io.to(roomCode).emit('game_aborted', {
               message: 'Not enough players to continue. Returning to lobby.',
             });
@@ -630,10 +753,7 @@ io.on('connection', (socket) => {
           } else if (room.phase === 'describing') {
             if (room.turnOrder[room.currentTurnIndex] === socket.id) {
               room.turnOrder = room.turnOrder.filter((id) => id !== socket.id);
-              room.currentTurnIndex = Math.min(
-                room.currentTurnIndex,
-                room.turnOrder.length - 1
-              );
+              room.currentTurnIndex = Math.min(room.currentTurnIndex, room.turnOrder.length - 1);
               if (room.turnOrder.length === 0) {
                 startVoting(room);
               } else {
@@ -657,6 +777,7 @@ io.on('connection', (socket) => {
     }, 30_000);
   });
 
+  // â”€â”€ RECONNECT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   socket.on('reconnect_player', ({ roomCode, username }, callback) => {
     const cb = typeof callback === 'function' ? callback : () => {};
     const code = (roomCode || '').trim().toUpperCase();
@@ -665,18 +786,13 @@ io.on('connection', (socket) => {
 
     let foundId = null;
     for (const [id, p] of room.players) {
-      if (
-        p.username.toLowerCase() === (username || '').trim().toLowerCase() &&
-        !p.connected
-      ) {
+      if (p.username.toLowerCase() === (username || '').trim().toLowerCase() && !p.connected) {
         foundId = id;
         break;
       }
     }
 
-    if (!foundId) {
-      return cb({ error: 'No disconnected player found with that name.' });
-    }
+    if (!foundId) return cb({ error: 'No disconnected player found with that name.' });
 
     const oldPlayer = room.players.get(foundId);
     if (oldPlayer.disconnectTimeout) {
@@ -714,7 +830,7 @@ io.on('connection', (socket) => {
     socket.data.roomCode = code;
     socket.data.username = oldPlayer.username;
 
-    cb({ success: true, roomCode: code, playerId: socket.id });
+    cb({ success: true, roomCode: code, playerId: socket.id, devMode: room.devMode });
     broadcastRoomState(room);
     if (room.phase !== 'lobby' && room.phase !== 'reveal') {
       socket.emit('private_info', privatePlayerInfo(room, socket.id));
@@ -723,14 +839,22 @@ io.on('connection', (socket) => {
   });
 });
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 //  STATIC FILES & SERVER START
-// ─────────────────────────────────────────────
-app.use(express.static(path.join(__dirname, 'public')));
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    }
+  }
+}));
+
 app.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 server.listen(PORT, () => {
-  console.log(`\n🦎  Chameleon Game Server running on http://localhost:${PORT}\n`);
+  console.log(`\nğŸ¦  Chameleon Game Server running on http://localhost:${PORT}\n`);
 });

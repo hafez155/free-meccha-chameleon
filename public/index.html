@@ -16,7 +16,10 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body,html{width:100%;height:100%;overflow:hidden;background:#020308;font-family:'Outfit',sans-serif;color:#f1f5f9;user-select:none}
+body,html{width:100%;height:100%;overflow:hidden;
+background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+background-image: url('data:image/svg+xml;utf8,<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="1.5" fill="rgba(34,197,94,0.15)"/></svg>'), radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+font-family:'Outfit',sans-serif;color:#f1f5f9;user-select:none}
 
 #c{display:block;width:100vw;height:100vh;position:fixed;inset:0;z-index:1;cursor:crosshair}
 
@@ -106,9 +109,53 @@ label{display:block;font-size:0.75rem;font-weight:800;color:#64748b;text-transfo
 #crosshair.aim{opacity:1}
 #crosshair.aim span{background:#ef4444;box-shadow:0 0 12px rgba(239,68,68,0.95)}
 
+/* ── COLOR PICKER PANEL ── */
+#color-panel{
+  position:absolute;left:2rem;top:50%;transform:translateY(-50%);
+  background:rgba(6,9,20,0.96);border:1px solid rgba(34,197,94,0.25);
+  border-radius:1.5rem;padding:1.25rem;width:220px;
+  backdrop-filter:blur(20px);pointer-events:all;
+  box-shadow:0 20px 60px rgba(0,0,0,0.85);
+  transition:opacity 0.25s,transform 0.25s;
+}
+#color-panel.hidden{opacity:0;pointer-events:none;transform:translateY(-50%) translateX(-20px)}
+#color-panel h3{font-family:'Space Grotesk',sans-serif;font-size:0.8rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.85rem}
+#color-wheel-canvas{width:160px;height:160px;border-radius:50%;cursor:crosshair;display:block;margin:0 auto 0.75rem}
+#color-preview-row{display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem}
+#color-preview-box{width:40px;height:40px;border-radius:0.6rem;border:2px solid rgba(255,255,255,0.15);flex-shrink:0}
+#color-hex-inp{flex:1;background:rgba(2,3,8,0.9);border:1px solid rgba(255,255,255,0.1);border-radius:0.5rem;padding:0.4rem 0.6rem;color:#f1f5f9;font-size:0.8rem;font-family:monospace;outline:none;width:0}
+#color-presets{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:0.75rem}
+.cpreset{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all 0.15s;flex-shrink:0}
+.cpreset:hover,.cpreset.sel{border-color:#fff;transform:scale(1.2)}
+#eyedrop-btn{width:100%;padding:0.5rem;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);border-radius:0.75rem;color:#86efad;font-weight:800;font-size:0.78rem;cursor:pointer;transition:all 0.2s}
+#eyedrop-btn:hover{background:rgba(34,197,94,0.25)}
+#color-panel-key{font-size:0.7rem;color:#334155;text-align:center;margin-top:0.6rem}
+
+/* ── POSE WHEEL ── */
+#pose-wheel{
+  position:absolute;right:2rem;top:50%;transform:translateY(-50%);
+  background:rgba(6,9,20,0.96);border:1px solid rgba(139,92,246,0.3);
+  border-radius:1.5rem;padding:1.25rem;width:210px;
+  backdrop-filter:blur(20px);pointer-events:all;
+  box-shadow:0 20px 60px rgba(0,0,0,0.85);
+  transition:opacity 0.25s,transform 0.25s;
+}
+#pose-wheel.hidden{opacity:0;pointer-events:none;transform:translateY(-50%) translateX(20px)}
+#pose-wheel h3{font-family:'Space Grotesk',sans-serif;font-size:0.8rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.85rem}
+.pose-btn{
+  display:flex;align-items:center;gap:0.6rem;width:100%;
+  padding:0.55rem 0.85rem;border-radius:0.75rem;border:1px solid rgba(255,255,255,0.06);
+  background:rgba(10,14,28,0.7);cursor:pointer;transition:all 0.18s;
+  color:#94a3b8;font-size:0.82rem;font-weight:700;margin-bottom:4px;
+}
+.pose-btn:hover{background:rgba(139,92,246,0.15);border-color:rgba(139,92,246,0.4);color:#c4b5fd}
+.pose-btn.active{background:rgba(139,92,246,0.22);border-color:#7c3aed;color:#a78bfa;box-shadow:0 0 12px rgba(139,92,246,0.25)}
+.pose-icon{font-size:1.1rem;flex-shrink:0}
+#pose-panel-key{font-size:0.7rem;color:#334155;text-align:center;margin-top:0.4rem}
+
 /* ── HUD CHAT ── */
-#chat-wrap{position:absolute;bottom:2rem;right:2rem;width:320px;pointer-events:all}
-#chat-msgs{max-height:180px;overflow-y:auto;margin-bottom:0.6rem;font-size:0.8rem;display:flex;flex-direction:column;gap:4px}
+#chat-wrap{position:absolute;bottom:2rem;right:2rem;width:280px;pointer-events:all}
+#chat-msgs{max-height:160px;overflow-y:auto;margin-bottom:0.6rem;font-size:0.8rem;display:flex;flex-direction:column;gap:4px}
 .cmsg{padding:0.3rem 0.6rem;border-radius:0.5rem;background:rgba(15,23,42,0.85);color:#94a3b8;border-left:2px solid rgba(255,255,255,0.1)}
 .cmsg .cn{font-weight:800;color:#f1f5f9}
 .cmsg.sys{color:#22c55e;background:rgba(34,197,94,0.08);border-left:2px solid #22c55e;font-style:italic}
@@ -117,7 +164,7 @@ label{display:block;font-size:0.75rem;font-weight:800;color:#64748b;text-transfo
 #chat-send{background:#22c55e;border:none;border-radius:0.6rem;padding:0.6rem 1.1rem;color:#fff;cursor:pointer;font-weight:800}
 
 /* ── HUD CONTROLS ── */
-#controls-hint{position:absolute;bottom:2rem;left:2rem;font-size:0.8rem;color:#64748b;pointer-events:none;line-height:1.8}
+#controls-hint{position:absolute;bottom:2rem;left:2rem;font-size:0.78rem;color:#64748b;pointer-events:none;line-height:1.9}
 #controls-hint b{color:#cbd5e1}
 
 /* ── NOTIFICATION ── */
@@ -127,12 +174,30 @@ label{display:block;font-size:0.75rem;font-weight:800;color:#64748b;text-transfo
 #lock-notice{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity 0.3s}
 #lock-notice.show{opacity:1}
 #lock-notice div{background:rgba(2,3,8,0.85);padding:0.75rem 1.75rem;border-radius:9999px;font-size:0.9rem;color:#94a3b8;font-weight:700}
+
+/* ── BLINDFOLD & PLAYER LIST ── */
+#blindfold{position:fixed;inset:0;z-index:100;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.5s}
+#blindfold.show{opacity:1;pointer-events:all}
+#blindfold h1{color:#ef4444;font-size:3rem;margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.1em}
+#blindfold p{color:#94a3b8;font-size:1.2rem}
+
+#player-list{position:absolute;top:6rem;right:2.5rem;width:240px;display:flex;flex-direction:column;gap:0.4rem;pointer-events:none}
+.pl-item{display:flex;align-items:center;justify-content:space-between;background:rgba(10,15,30,0.85);border:1px solid rgba(255,255,255,0.08);padding:0.5rem 0.8rem;border-radius:0.75rem;font-size:0.85rem;color:#cbd5e1;font-weight:700;transition:all 0.3s}
+.pl-item.hunter{border-color:rgba(239,68,68,0.4);background:rgba(239,68,68,0.1)}
+.pl-item .pl-name{display:flex;align-items:center;gap:0.4rem}
+.pl-item .pl-icon{font-size:1.1rem}
 </style>
 </head>
 <body>
 
 <canvas id="c"></canvas>
 <div id="lock-notice"><div>Click Screen to Control Player (WASD + Space)</div></div>
+
+<!-- BLINDFOLD -->
+<div id="blindfold">
+  <h1>Hide Time</h1>
+  <p>The Chameleons are hiding. Please wait...</p>
+</div>
 
 <!-- HUD -->
 <div id="hud" style="display:none">
@@ -141,11 +206,13 @@ label{display:block;font-size:0.75rem;font-weight:800;color:#64748b;text-transfo
     <div id="hud-timer">90</div>
     <div id="hud-phase">Playing</div>
   </div>
+  
+  <div id="player-list"></div>
 
   <div id="blend-wrap" class="hidden">
     <div id="blend-label">🦎 CAMOUFLAGE</div>
     <div id="blend-bar-bg"><div id="blend-bar"></div></div>
-    <div id="blend-hint">Press and Hold [E] near a colored panel!</div>
+    <div id="blend-hint">Get near a wall panel to absorb its color!</div>
   </div>
 
   <div id="crosshair">
@@ -153,10 +220,31 @@ label{display:block;font-size:0.75rem;font-weight:800;color:#64748b;text-transfo
     <span class="ch-v"></span>
   </div>
 
+  <!-- COLOR PICKER -->
+  <div id="color-panel" class="hidden">
+    <h3>🎨 Paint Color <span style="color:#22c55e">[E]</span></h3>
+    <canvas id="color-wheel-canvas" width="160" height="160"></canvas>
+    <div id="color-preview-row">
+      <div id="color-preview-box"></div>
+      <input id="color-hex-inp" maxlength="7" placeholder="#22c55e"/>
+    </div>
+    <div id="color-presets"></div>
+    <button id="eyedrop-btn" onclick="eyedropNearPanel()">💉 Sample Nearby Panel Color</button>
+    <div id="color-panel-key">Press E again to close</div>
+  </div>
+
+  <!-- POSE WHEEL -->
+  <div id="pose-wheel" class="hidden">
+    <h3>🕹️ Poses <span style="color:#a78bfa">[Q]</span></h3>
+    <div id="pose-list"></div>
+    <div id="pose-panel-key">Press Q again to close</div>
+  </div>
+
   <div id="controls-hint">
     <b>WASD</b> Move &nbsp; <b>SPACE</b> Jump &nbsp; <b>Mouse</b> Look<br>
-    <b>Hold E</b> Camouflage Color &nbsp; <b>Click</b> Catch Player<br>
-    <b>Esc</b> Release mouse cursor
+    <b>E</b> Color Picker &nbsp; <b>Q</b> Pose Wheel<br>
+    <b>Hold X</b> Camouflage (near panel) &nbsp; <b>Click</b> Catch<br>
+    <b>Esc</b> Release cursor
   </div>
 
   <div id="chat-wrap">
@@ -343,6 +431,91 @@ const particleSystem = new THREE.Group();
 scene.add(particleSystem);
 let particlesPool = [];
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  AUDIO SYSTEM (Web Audio API)
+// ─────────────────────────────────────────────────────────────────────────────
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+let heartbeatOsc = null;
+let heartbeatGain = null;
+let heartbeatInterval = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new AudioContext();
+    const g = audioCtx.createGain();
+    g.gain.value = 0;
+    g.connect(audioCtx.destination);
+    heartbeatGain = g;
+    
+    heartbeatOsc = audioCtx.createOscillator();
+    heartbeatOsc.type = 'sine';
+    heartbeatOsc.frequency.value = 60; // Deep bass
+    heartbeatOsc.connect(heartbeatGain);
+    heartbeatOsc.start();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function playSFX(type) {
+  if (!audioCtx) return;
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  if (type === 'color') {
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(400, t);
+    osc.frequency.exponentialRampToValueAtTime(800, t + 0.1);
+    gain.gain.setValueAtTime(0.1, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+    osc.start(t); osc.stop(t + 0.1);
+  } else if (type === 'pose') {
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(300, t);
+    osc.frequency.linearRampToValueAtTime(200, t + 0.15);
+    gain.gain.setValueAtTime(0.1, t);
+    gain.gain.linearRampToValueAtTime(0.01, t + 0.15);
+    osc.start(t); osc.stop(t + 0.15);
+  } else if (type === 'catch') {
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, t);
+    osc.frequency.exponentialRampToValueAtTime(40, t + 0.3);
+    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+    osc.start(t); osc.stop(t + 0.3);
+  }
+}
+
+function updateHeartbeat(minDist) {
+  if (!audioCtx || !heartbeatGain) return;
+  if (minDist > 15 || !iAmChameleon || gamePhase !== 'playing') {
+    heartbeatGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+    if (heartbeatInterval) { clearInterval(heartbeatInterval); heartbeatInterval = null; }
+    return;
+  }
+  
+  // Closer = faster and louder
+  const intensity = 1 - (minDist / 15); // 0 to 1
+  const vol = intensity * 0.4;
+  const rate = 1000 - (intensity * 600); // 1000ms down to 400ms
+  
+  if (!heartbeatInterval || heartbeatGain.dataset?.rate !== rate.toString()) {
+    if (heartbeatInterval) clearInterval(heartbeatInterval);
+    heartbeatGain.dataset = { rate: rate.toString() };
+    heartbeatInterval = setInterval(() => {
+      const t = audioCtx.currentTime;
+      heartbeatGain.gain.setValueAtTime(0, t);
+      heartbeatGain.gain.linearRampToValueAtTime(vol, t + 0.1);
+      heartbeatGain.gain.linearRampToValueAtTime(0, t + 0.3);
+    }, rate);
+  }
+}
+scene.add(particleSystem);
+let particlesPool = [];
+
 function spawnDustParticle(pos, colorHex='#ffffff') {
   let mesh;
   if (particlesPool.length > 0) {
@@ -471,17 +644,25 @@ function buildMap(mapData) {
       let geo, shape;
       if (i % 2 === 0) {
         geo = new THREE.CylinderGeometry(ob.w/2, ob.w/2, ob.h, 24);
-        shape = new CANNON.Cylinder(ob.w/2, ob.w/2, ob.h, 24);
+        // CANNON.Cylinder has issues with standard orientations, we'll use box for physics of cylinder for stability
+        shape = new CANNON.Box(new CANNON.Vec3(ob.w/2, ob.h/2, ob.w/2)); 
       } else {
         geo = new THREE.BoxGeometry(ob.w, ob.h, ob.d);
         shape = new CANNON.Box(new CANNON.Vec3(ob.w/2, ob.h/2, ob.d/2));
       }
       
-      const mat = new THREE.MeshStandardMaterial({ color: hexToInt(mapData.wallColor), roughness: 0.5 });
+      const c = ob.color ? hexToInt(ob.color) : hexToInt(mapData.wallColor);
+      const mat = new THREE.MeshStandardMaterial({ color: c, roughness: 0.5 });
       const mesh = new THREE.Mesh(geo, mat);
       mesh.position.set(ob.x, ob.h/2, ob.z);
       mesh.castShadow = true; mesh.receiveShadow = true;
       scene.add(mesh); mapObjs.push(mesh);
+      
+      if (ob.color) {
+        mesh.userData.panelColor = ob.color;
+        mesh.userData.isPanel = true;
+        panelMeshes.push(mesh);
+      }
 
       // Obstacle Physics static body
       const body = new CANNON.Body({ mass: 0 });
@@ -519,52 +700,130 @@ function createLocalPlayerBody() {
 createLocalPlayerBody();
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  PREMIUM ROBOT CHARACTER & HAT SYSTEM WITH WALK/JUMP ANIMATIONS
+//  FULLY ARTICULATED CARTOON CHAMELEON CHARACTER
 // ─────────────────────────────────────────────────────────────────────────────
+function makeLimb(mat, r, h) {
+  const geo = new THREE.CapsuleGeometry(r, h, 8, 16);
+  return new THREE.Mesh(geo, mat);
+}
+
 function createPlayerMesh(id, username) {
   const group = new THREE.Group();
-  const col = new THREE.Color(myColor);
+  const col = new THREE.Color(id === myId ? myColor : '#3b82f6');
+  const mat  = new THREE.MeshStandardMaterial({ color: col, roughness: 0.25, metalness: 0.15 });
+  const darkMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.4 });
 
-  // Animation Root Group
+  // === ROOT (animates body bob/squash) ===
   const animRoot = new THREE.Group();
-  animRoot.name = "animRoot";
+  animRoot.name = 'animRoot';
   group.add(animRoot);
 
-  // Torso
-  const bodyGeo = new THREE.CapsuleGeometry(0.35, 0.55, 8, 16);
-  const bodyMat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.25, metalness: 0.4 });
-  const body = new THREE.Mesh(bodyGeo, bodyMat);
-  body.position.y = 0.65;
-  body.castShadow = true; body.receiveShadow = true;
-  animRoot.add(body);
+  // === TORSO ===
+  const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.38, 0.3, 12, 24), mat);
+  torso.name = 'torso';
+  torso.position.y = 0.68;
+  torso.castShadow = true;
+  animRoot.add(torso);
 
-  // Spherical Head
-  const headGeo = new THREE.SphereGeometry(0.34, 16, 16);
-  const headMat = new THREE.MeshStandardMaterial({ color: col, roughness: 0.25 });
-  const head = new THREE.Mesh(headGeo, headMat);
-  head.position.set(0, 1.2, 0.02);
+  // === HEAD ===
+  const headPivot = new THREE.Group();
+  headPivot.name = 'headPivot';
+  headPivot.position.set(0, 1.12, 0);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.35, 24, 24), mat);
+  head.name = 'head';
   head.castShadow = true;
-  animRoot.add(head);
+  headPivot.add(head);
 
-  // Visor
-  const visorGeo = new THREE.BoxGeometry(0.44, 0.16, 0.16);
-  const visorMat = new THREE.MeshStandardMaterial({ color: 0x070b12, roughness: 0.1, metalness: 0.9 });
-  const visor = new THREE.Mesh(visorGeo, visorMat);
-  visor.position.set(0, 1.22, 0.22);
-  animRoot.add(visor);
-
-  // Visor Light Glow Eye
-  const gemGeo = new THREE.SphereGeometry(0.05, 8, 8);
-  const gemMat = new THREE.MeshBasicMaterial({ color: 0x22c55e });
-  [-0.1, 0.1].forEach(ox => {
-    const gem = new THREE.Mesh(gemGeo, gemMat);
-    gem.position.set(ox, 1.22, 0.3);
-    gem.userData.isEye = true;
-    animRoot.add(gem);
+  // Glowing Eyes
+  const eyeW = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.05, metalness: 0 });
+  const pupilM = new THREE.MeshBasicMaterial({ color: 0x000000 });
+  const glowM = new THREE.MeshBasicMaterial({ color: col.getHex() });
+  [-0.16, 0.16].forEach(ox => {
+    const eyeSock = new THREE.Group();
+    eyeSock.position.set(ox, 0.12, 0.3);
+    const eyeball = new THREE.Mesh(new THREE.SphereGeometry(0.115, 16, 16), eyeW);
+    eyeball.userData.isEye = true;
+    const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.065, 12, 12), pupilM);
+    pupil.position.z = 0.075;
+    pupil.userData.isEye = true;
+    const glow = new THREE.Mesh(new THREE.SphereGeometry(0.04, 8, 8), glowM);
+    glow.position.set(0.025, 0.025, 0.1);
+    glow.userData.isEye = true;
+    eyeSock.add(eyeball, pupil, glow);
+    head.add(eyeSock);
   });
+
+  // Snout / Nose bump
+  const snout = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), mat);
+  snout.scale.set(1.4, 0.85, 1.0);
+  snout.position.set(0, -0.04, 0.32);
+  head.add(snout);
+
+  animRoot.add(headPivot);
+
+  // === TAIL ===
+  const tailPivot = new THREE.Group();
+  tailPivot.name = 'tailPivot';
+  tailPivot.position.set(0, 0.62, -0.38);
+  tailPivot.rotation.x = 0.5;
+  const tailSeg1 = new THREE.Mesh(new THREE.CapsuleGeometry(0.1, 0.28, 8, 16), mat);
+  tailSeg1.position.set(0, -0.18, 0);
+  const tailSeg2 = new THREE.Mesh(new THREE.CapsuleGeometry(0.07, 0.22, 8, 16), mat);
+  tailSeg2.position.set(0, -0.38, 0);
+  tailSeg2.rotation.z = 0.4;
+  const tailSeg3 = new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.15, 8, 16), mat);
+  tailSeg3.position.set(0.1, -0.52, 0);
+  tailSeg3.rotation.z = 0.8;
+  tailPivot.add(tailSeg1, tailSeg2, tailSeg3);
+  animRoot.add(tailPivot);
+
+  // === ARMS ===
+  function makeArm(side) {
+    const pivot = new THREE.Group();
+    pivot.name = side > 0 ? 'armPivotR' : 'armPivotL';
+    pivot.position.set(side * 0.48, 0.95, 0);
+    const upper = makeLimb(mat, 0.1, 0.28);
+    upper.position.y = -0.18;
+    const lowerPivot = new THREE.Group();
+    lowerPivot.name = side > 0 ? 'elbowR' : 'elbowL';
+    lowerPivot.position.y = -0.36;
+    const lower = makeLimb(mat, 0.085, 0.22);
+    lower.position.y = -0.14;
+    lowerPivot.add(lower);
+    pivot.add(upper, lowerPivot);
+    return pivot;
+  }
+  const armL = makeArm(-1);
+  const armR = makeArm(1);
+  animRoot.add(armL, armR);
+
+  // === LEGS ===
+  function makeLeg(side) {
+    const pivot = new THREE.Group();
+    pivot.name = side > 0 ? 'legPivotR' : 'legPivotL';
+    pivot.position.set(side * 0.22, 0.52, 0);
+    const upper = makeLimb(mat, 0.12, 0.3);
+    upper.position.y = -0.2;
+    const kneePivot = new THREE.Group();
+    kneePivot.name = side > 0 ? 'kneeR' : 'kneeL';
+    kneePivot.position.y = -0.4;
+    const lower = makeLimb(mat, 0.1, 0.26);
+    lower.position.y = -0.16;
+    // Foot
+    const foot = new THREE.Mesh(new THREE.SphereGeometry(0.11, 12, 12), mat);
+    foot.scale.set(1.3, 0.7, 1.6);
+    foot.position.y = -0.32;
+    kneePivot.add(lower, foot);
+    pivot.add(upper, kneePivot);
+    return pivot;
+  }
+  const legL = makeLeg(-1);
+  const legR = makeLeg(1);
+  animRoot.add(legL, legR);
 
   // Name tag
   const nameTag = makeNameTag(username, id === myId);
+  nameTag.position.y = 2.1;
   group.add(nameTag);
 
   group.userData.playerId = id;
@@ -598,51 +857,40 @@ function makeNameTag(name, isMe) {
 
 // 3D HATS GENERATOR
 function attachHat(group, hatType) {
-  let animRoot = group.getObjectByName("animRoot");
-  if (!animRoot) return;
-
-  let oldHat = animRoot.getObjectByName("hat");
-  if (oldHat) animRoot.remove(oldHat);
-
+  const headPivot = group.getObjectByName('headPivot');
+  if (!headPivot) return;
+  let oldHat = headPivot.getObjectByName('hat');
+  if (oldHat) headPivot.remove(oldHat);
   if (!hatType) return;
 
   const hatGroup = new THREE.Group();
-  hatGroup.name = "hat";
+  hatGroup.name = 'hat';
 
   if (hatType === 'cowboy') {
-    const baseGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.04, 16);
-    const baseMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.8 });
-    const base = new THREE.Mesh(baseGeo, baseMat);
-    base.position.y = 1.48;
-    hatGroup.add(base);
-
-    const topGeo = new THREE.CylinderGeometry(0.28, 0.32, 0.3, 16);
-    const top = new THREE.Mesh(topGeo, baseMat);
-    top.position.y = 1.62;
-    hatGroup.add(top);
-  } 
-  else if (hatType === 'top') {
-    const baseGeo = new THREE.CylinderGeometry(0.46, 0.46, 0.03, 16);
-    const baseMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5 });
-    const base = new THREE.Mesh(baseGeo, baseMat);
-    base.position.y = 1.48;
-    hatGroup.add(base);
-
-    const topGeo = new THREE.CylinderGeometry(0.26, 0.26, 0.45, 16);
-    const top = new THREE.Mesh(topGeo, baseMat);
-    top.position.y = 1.7;
-    hatGroup.add(top);
-  }
-  else if (hatType === 'halo') {
-    const torusGeo = new THREE.TorusGeometry(0.22, 0.04, 8, 24);
-    const torusMat = new THREE.MeshBasicMaterial({ color: 0xfde047 });
-    const halo = new THREE.Mesh(torusGeo, torusMat);
-    halo.position.y = 1.75;
-    halo.rotation.x = Math.PI/2;
-    hatGroup.add(halo);
+    const baseMat = new THREE.MeshStandardMaterial({ color: 0x7c4a1e, roughness: 0.8 });
+    const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.52, 0.04, 20), baseMat);
+    brim.position.y = 0.36;
+    const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.31, 0.32, 20), baseMat);
+    crown.position.y = 0.52;
+    hatGroup.add(brim, crown);
+  } else if (hatType === 'top') {
+    const baseMat = new THREE.MeshStandardMaterial({ color: 0x0f0f0f, roughness: 0.35, metalness: 0.5 });
+    const brim = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.03, 20), baseMat);
+    brim.position.y = 0.36;
+    const crown = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.48, 20), baseMat);
+    crown.position.y = 0.6;
+    hatGroup.add(brim, crown);
+  } else if (hatType === 'halo') {
+    const halo = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.035, 10, 32),
+      new THREE.MeshBasicMaterial({ color: 0xfde047 }));
+    halo.position.y = 0.55;
+    halo.rotation.x = Math.PI / 2;
+    const glow = new THREE.PointLight(0xfde047, 2.5, 1.5);
+    glow.position.y = 0.55;
+    hatGroup.add(halo, glow);
   }
 
-  animRoot.add(hatGroup);
+  headPivot.add(hatGroup);
 }
 
 function updatePlayerMeshColor(id, colorHex, blendLv) {
@@ -663,48 +911,175 @@ function updatePlayerMeshColor(id, colorHex, blendLv) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-//  SYNCHRONOUS MOVEMENT & WALKING/JUMPING MICRO-ANIMATIONS
+//  ARTICULATED WALK/JUMP/IDLE ANIMATION SYSTEM
 // ─────────────────────────────────────────────────────────────────────────────
+const playerAnimState = new Map(); // stores per-player walk phase / land timer
+
+function driveCharacterAnim(group, isMoving, isJumping, dt) {
+  const pid = group.userData.playerId;
+  if (!playerAnimState.has(pid)) playerAnimState.set(pid, { phase:0, landTimer:0, wasJumping:false });
+  const st = playerAnimState.get(pid);
+
+  const animRoot   = group.getObjectByName('animRoot');
+  const headPivot  = group.getObjectByName('headPivot');
+  const torso      = group.getObjectByName('torso');
+  const armPivotL  = group.getObjectByName('armPivotL');
+  const armPivotR  = group.getObjectByName('armPivotR');
+  const elbowL     = group.getObjectByName('elbowL');
+  const elbowR     = group.getObjectByName('elbowR');
+  const legPivotL  = group.getObjectByName('legPivotL');
+  const legPivotR  = group.getObjectByName('legPivotR');
+  const kneeL      = group.getObjectByName('kneeL');
+  const kneeR      = group.getObjectByName('kneeR');
+  const tailPivot  = group.getObjectByName('tailPivot');
+  if (!animRoot) return;
+
+  const t = performance.now() * 0.001;
+
+  // Land squash: when landing from jump
+  if (st.wasJumping && !isJumping) st.landTimer = 0.18;
+  st.wasJumping = isJumping;
+  if (st.landTimer > 0) st.landTimer = Math.max(0, st.landTimer - dt);
+  const landFactor = Math.max(0, st.landTimer / 0.18);
+
+  // JUMP STATE
+  if (isJumping) {
+    animRoot.scale.set(0.78, 1.38, 0.78);
+    animRoot.position.y = 0;
+    if (armPivotL) armPivotL.rotation.x = -1.2;
+    if (armPivotR) armPivotR.rotation.x = -1.2;
+    if (elbowL) elbowL.rotation.x = -0.5;
+    if (elbowR) elbowR.rotation.x = -0.5;
+    if (legPivotL) legPivotL.rotation.x = 0.5;
+    if (legPivotR) legPivotR.rotation.x = 0.5;
+    if (kneeL) kneeL.rotation.x = -0.8;
+    if (kneeR) kneeR.rotation.x = -0.8;
+    if (headPivot) headPivot.rotation.x = -0.15;
+    if (tailPivot) tailPivot.rotation.x = -0.4;
+    return;
+  }
+
+  // LAND SQUASH
+  if (landFactor > 0) {
+    const sq = landFactor;
+    animRoot.scale.set(1 + sq*0.4, 1 - sq*0.35, 1 + sq*0.4);
+    animRoot.position.y = 0;
+    if (armPivotL) armPivotL.rotation.x = sq * 0.6;
+    if (armPivotR) armPivotR.rotation.x = sq * 0.6;
+    if (legPivotL) legPivotL.rotation.x = -sq * 0.3;
+    if (legPivotR) legPivotR.rotation.x = -sq * 0.3;
+    spawnDustParticle(group.position.clone().add(new THREE.Vector3((Math.random()-0.5)*0.5,0,(Math.random()-0.5)*0.5)), '#64748b');
+    return;
+  }
+
+  // WALK STATE
+  if (isMoving) {
+    st.phase += dt * 8.5; // walk cycle speed
+    const p = st.phase;
+    const swing    = Math.sin(p) * 0.55;
+    const oppSwing = -swing;
+    const bodyBob  = Math.abs(Math.sin(p)) * 0.06;
+    const sideRock = Math.sin(p) * 0.06;
+
+    // Body squash-stretch per step
+    const stepSq = 1 + Math.abs(Math.sin(p * 2)) * 0.07;
+    animRoot.scale.set(1/stepSq * 0.98, stepSq, 1/stepSq * 0.98);
+    animRoot.position.y = bodyBob;
+    animRoot.rotation.z = sideRock;
+
+    // Legs stride
+    if (legPivotL) legPivotL.rotation.x = swing;
+    if (legPivotR) legPivotR.rotation.x = oppSwing;
+    if (kneeL) kneeL.rotation.x = Math.max(0, -swing) * 0.9;
+    if (kneeR) kneeR.rotation.x = Math.max(0, -oppSwing) * 0.9;
+
+    // Arms counter-swing
+    if (armPivotL) { armPivotL.rotation.x = oppSwing * 0.6; armPivotL.rotation.z = 0; }
+    if (armPivotR) { armPivotR.rotation.x = swing * 0.6;    armPivotR.rotation.z = 0; }
+    if (elbowL) elbowL.rotation.x = Math.max(0, oppSwing) * 0.45;
+    if (elbowR) elbowR.rotation.x = Math.max(0, swing) * 0.45;
+
+    // Head bobs slightly
+    if (headPivot) { headPivot.rotation.x = Math.sin(p * 2) * 0.05; headPivot.rotation.z = sideRock * 0.4; }
+
+    // Tail wags
+    if (tailPivot) tailPivot.rotation.z = Math.sin(p * 1.2) * 0.35;
+
+    // Foot dust
+    if (Math.random() < 0.2) spawnDustParticle(group.position.clone(), '#334155');
+    return;
+  }
+
+  // IDLE STATE – breathing
+  const breathe = Math.sin(t * 2.2) * 0.03;
+  animRoot.scale.set(1 + breathe, 1 - breathe * 0.8, 1 + breathe);
+  animRoot.position.y = Math.sin(t * 1.8) * 0.015;
+  animRoot.rotation.z = 0;
+  st.phase = 0; // reset phase so walk starts smooth
+
+  // Arms hang naturally
+  if (armPivotL) { armPivotL.rotation.x = 0.1; armPivotL.rotation.z = 0.08; }
+  if (armPivotR) { armPivotR.rotation.x = 0.1; armPivotR.rotation.z = -0.08; }
+  if (elbowL) elbowL.rotation.x = 0.15;
+  if (elbowR) elbowR.rotation.x = 0.15;
+  if (legPivotL) { legPivotL.rotation.x = 0; }
+  if (legPivotR) { legPivotR.rotation.x = 0; }
+  if (kneeL) kneeL.rotation.x = 0.05;
+  if (kneeR) kneeR.rotation.x = 0.05;
+
+  // Head idle sway
+  if (headPivot) { headPivot.rotation.x = Math.sin(t * 0.9) * 0.04; headPivot.rotation.z = Math.sin(t * 1.1) * 0.03; }
+  // Tail idle curl
+  if (tailPivot) tailPivot.rotation.z = Math.sin(t * 0.8) * 0.12;
+}
+
 function syncPlayer(pd) {
   let group = playerMeshes.get(pd.id);
   if (!group) group = createPlayerMesh(pd.id, pd.username);
 
-  const targetX = pd.id === myId ? myX : pd.x;
-  const targetY = pd.id === myId ? myY : pd.y;
-  const targetZ = pd.id === myId ? myZ : pd.z;
+  const targetX   = pd.id === myId ? myX : pd.x;
+  const targetY   = pd.id === myId ? myY : pd.y;
+  const targetZ   = pd.id === myId ? myZ : pd.z;
   const targetRotY = pd.id === myId ? myRotY : pd.rotY;
 
-  group.position.lerp(new THREE.Vector3(targetX, targetY, targetZ), 0.35);
+  const prev = group.position.clone();
+  group.position.lerp(new THREE.Vector3(targetX, targetY, targetZ), 0.3);
   group.rotation.y = targetRotY;
+  group.userData.isHunter = !pd.isChameleon;
 
   if (pd.hat !== group.userData.hatAttached) {
     group.userData.hatAttached = pd.hat;
     attachHat(group, pd.hat);
   }
 
-  const animRoot = group.getObjectByName("animRoot");
-  if (animRoot) {
-    const isMoving = Math.abs(group.position.x - targetX) > 0.02 || Math.abs(group.position.z - targetZ) > 0.02;
-    const isJumping = targetY > 0.95;
-
-    const time = performance.now() * 0.001;
-
-    if (isJumping) {
-      animRoot.scale.set(0.9, 1.15, 0.9);
-      animRoot.position.y = 0;
-    } else if (isMoving) {
-      animRoot.scale.set(1, 1, 1);
-      animRoot.rotation.z = Math.sin(time * 12) * 0.08;
-      animRoot.position.y = Math.abs(Math.sin(time * 12)) * 0.06;
-      
-      if (Math.random() < 0.15) {
-        spawnDustParticle(group.position, '#334155');
-      }
-    } else {
-      animRoot.scale.set(1, 1, 1);
-      animRoot.rotation.z = 0;
-      animRoot.position.y = Math.sin(time * 3) * 0.02;
+  const moved = prev.distanceTo(group.position);
+  const isMoving  = moved > 0.008;
+  const isJumping = targetY > 1.05;
+  
+  const poseId = pd.pose || 'stand';
+  if (poseId !== 'stand' && !isMoving && !isJumping) {
+    const poseObj = POSES.find(p => p.id === poseId);
+    if (poseObj) poseObj.fn(group);
+    
+    // Add subtle breathing to static poses
+    const animRoot = group.getObjectByName('animRoot');
+    if (animRoot) {
+      const t = performance.now() * 0.001;
+      const breathe = Math.sin(t * 2.2) * 0.02;
+      animRoot.scale.x += breathe;
+      animRoot.scale.y -= breathe * 0.5;
+      animRoot.scale.z += breathe;
     }
+  } else {
+    // If moving, automatically cancel local pose
+    if (pd.id === myId && currentPoseId !== 'stand') {
+      currentPoseId = 'stand';
+      socket.emit('player_pose', { pose: 'stand' });
+      document.querySelectorAll('.pose-btn').forEach(b => b.classList.remove('active'));
+      const btn = document.getElementById('pose-btn-stand');
+      if (btn) btn.classList.add('active');
+    }
+    driveCharacterAnim(group, isMoving, isJumping, 0.016);
   }
 
   updatePlayerMeshColor(pd.id, pd.color, pd.blendLevel);
@@ -713,9 +1088,7 @@ function syncPlayer(pd) {
     if (c.userData.isNameTag) c.quaternion.copy(camera.quaternion);
   });
 
-  if (pd.caught) {
-    group.scale.setScalar(0.001);
-  }
+  if (pd.caught) group.scale.setScalar(0.001);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -738,8 +1111,23 @@ document.addEventListener('mousemove', e => {
 
 window.addEventListener('keydown', e => {
   keys[e.code] = true;
-  if (e.code === 'Escape') document.exitPointerLock?.();
+  if (e.code === 'Escape') {
+    document.exitPointerLock?.();
+    closeColorPicker();
+    closePoseWheel();
+  }
   if (gamePhase === 'playing' && ['Space','KeyW','KeyA','KeyS','KeyD'].includes(e.code)) e.preventDefault();
+
+  // E = Color Picker toggle
+  if (e.code === 'KeyE' && gamePhase === 'playing' && !myCaught) {
+    e.preventDefault();
+    toggleColorPicker();
+  }
+  // Q = Pose Wheel toggle
+  if (e.code === 'KeyQ' && gamePhase === 'playing' && !myCaught) {
+    e.preventDefault();
+    togglePoseWheel();
+  }
 });
 window.addEventListener('keyup', e => { keys[e.code] = false; });
 
@@ -750,7 +1138,10 @@ canvas.addEventListener('click', () => {
   const hits = raycaster.intersectObjects(objs, true);
   if (hits.length > 0) {
     const pid = hits[0].object.userData.playerId;
-    if (pid) socket.emit('hunter_click', { targetId: pid });
+    if (pid) {
+      socket.emit('hunter_click', { targetId: pid });
+      playSFX('catch');
+    }
   }
 });
 
@@ -759,6 +1150,7 @@ canvas.addEventListener('click', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 const MOVE_SPEED = 6.2;
 const BOUNDS = 16.0;
+const JUMP_FORCE = 8.5;
 
 function updateMovement(dt) {
   if (gamePhase !== 'playing') {
@@ -814,11 +1206,11 @@ function updateMovement(dt) {
 
   // Sync coords from physics engine body
   myX = playerBody.position.x;
-  myY = playerBody.position.y + 0.35; // Head offset
+  myY = playerBody.position.y + 0.35;
   myZ = playerBody.position.z;
 
-  // 4. E Camouflage
-  if (iAmChameleon && keys['KeyE']) {
+  // X = Camouflage (hold X near panel to blend)
+  if (iAmChameleon && keys['KeyX']) {
     nearPanel = findNearPanel();
     if (nearPanel) {
       blendLevel = Math.min(1, blendLevel + dt * 2.0);
@@ -827,19 +1219,14 @@ function updateMovement(dt) {
       cur.lerp(tgt, Math.min(1, dt * 9.0));
       myColor = '#' + cur.getHexString();
       socket.emit('chameleon_blend', { blendLevel, color: myColor });
-
-      // Sparkles
       if (Math.random() < 0.35) {
         spawnDustParticle(new THREE.Vector3(myX + (Math.random()-0.5), myY + Math.random(), myZ + (Math.random()-0.5)), nearPanel);
       }
+      applyColorToMyMesh(myColor);
     }
-  } else if (iAmChameleon && !keys['KeyE']) {
+  } else if (iAmChameleon && !keys['KeyX']) {
     if (blendLevel > 0) {
       blendLevel = Math.max(0, blendLevel - dt * 2.0);
-      const cur  = new THREE.Color(myColor);
-      const original = new THREE.Color('#22c55e');
-      cur.lerp(original, Math.min(1, dt * 6.0));
-      myColor = '#' + cur.getHexString();
       socket.emit('chameleon_blend', { blendLevel, color: myColor });
     }
   }
@@ -847,9 +1234,10 @@ function updateMovement(dt) {
   // Blend HUD
   if (iAmChameleon) {
     document.getElementById('blend-bar').style.width = (blendLevel * 100) + '%';
-    document.getElementById('blend-hint').textContent = nearPanel && !moving
-      ? 'BLENDING IN... Keep holding E!'
-      : (moving ? 'Stop moving to blend!' : 'Get close to a colored wall panel!');
+    nearPanel = findNearPanel();
+    document.getElementById('blend-hint').textContent = nearPanel
+      ? (keys['KeyX'] ? 'BLENDING IN! Hold X!' : 'Hold X to blend into nearby panel!')
+      : 'Move close to a colored wall panel!';
   }
 
   // Send moves to socket (20fps)
@@ -858,6 +1246,20 @@ function updateMovement(dt) {
     lastSend = now;
     socket.emit('player_move', { x:myX, y:myY, z:myZ, rotY:myRotY });
   }
+
+  // Heartbeat distance
+  if (iAmChameleon) {
+    let minHunterDist = Infinity;
+    const myPos = new THREE.Vector3(myX, myY, myZ);
+    for (const [id, grp] of playerMeshes) {
+       if (grp.userData.isHunter) {
+          minHunterDist = Math.min(minHunterDist, myPos.distanceTo(grp.position));
+       }
+    }
+    updateHeartbeat(minHunterDist);
+  } else {
+    updateHeartbeat(Infinity);
+  }
 }
 
 function findNearPanel() {
@@ -865,9 +1267,236 @@ function findNearPanel() {
   const myPos = new THREE.Vector3(myX, myY, myZ);
   panelMeshes.forEach(p => {
     const d = myPos.distanceTo(p.position);
-    if (d < 4.2 && d < minD) { minD = d; color = p.userData.panelColor; }
+    if (d < 7.0 && d < minD) { minD = d; color = p.userData.panelColor; }
   });
   return color;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  COLOR PICKER SYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+const COLOR_PRESETS = [
+  '#22c55e','#3b82f6','#ef4444','#f59e0b','#a855f7','#ec4899',
+  '#06b6d4','#f97316','#84cc16','#14b8a6','#e11d48','#6366f1',
+  '#ffffff','#94a3b8','#475569','#1e293b','#fde047','#fb923c'
+];
+
+let colorPickerOpen = false;
+let _cwCtx;
+
+function initColorWheel() {
+  const cvs = document.getElementById('color-wheel-canvas');
+  const ctx  = cvs.getContext('2d');
+  _cwCtx = ctx;
+  const cx = 80, cy = 80, r = 78;
+  // Draw hue ring
+  for (let a = 0; a < 360; a++) {
+    const a1 = (a - 1) * Math.PI / 180;
+    const a2 = (a + 1) * Math.PI / 180;
+    const grad = ctx.createRadialGradient(cx, cy, r * 0.4, cx, cy, r);
+    grad.addColorStop(0, `hsl(${a},0%,100%)`);
+    grad.addColorStop(1, `hsl(${a},100%,50%)`);
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, a1, a2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+  // Center brightness gradient
+  const cGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 0.42);
+  cGrad.addColorStop(0, 'rgba(0,0,0,0.85)');
+  cGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.42, 0, Math.PI * 2);
+  ctx.fillStyle = cGrad;
+  ctx.fill();
+
+  cvs.addEventListener('click', e => {
+    const rect = cvs.getBoundingClientRect();
+    const scaleX = cvs.width  / rect.width;
+    const scaleY = cvs.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top)  * scaleY;
+    const px = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+    const hex = '#' + [px[0],px[1],px[2]].map(v => v.toString(16).padStart(2,'0')).join('');
+    applyPickedColor(hex);
+  });
+
+  // Presets
+  const presetDiv = document.getElementById('color-presets');
+  COLOR_PRESETS.forEach(c => {
+    const b = document.createElement('div');
+    b.className = 'cpreset';
+    b.style.background = c;
+    b.onclick = () => applyPickedColor(c);
+    presetDiv.appendChild(b);
+  });
+
+  // Hex input
+  const hexInp = document.getElementById('color-hex-inp');
+  hexInp.addEventListener('change', () => {
+    const v = hexInp.value.trim();
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) applyPickedColor(v);
+  });
+}
+
+function applyPickedColor(hex) {
+  myColor = hex;
+  document.getElementById('color-preview-box').style.background = hex;
+  document.getElementById('color-hex-inp').value = hex;
+  applyColorToMyMesh(hex);
+  socket.emit('player_color', { color: hex });
+  playSFX('color');
+  notify('🎨 Color applied!', hex, 1500);
+}
+
+function applyColorToMyMesh(hex) {
+  const group = playerMeshes.get(myId);
+  if (!group) return;
+  const col = new THREE.Color(hex);
+  group.traverse(child => {
+    if (!child.isMesh || child.userData.isEye || child.userData.isNameTag) return;
+    child.material.color.copy(col);
+  });
+}
+
+function eyedropNearPanel() {
+  const c = findNearPanel();
+  if (c) { applyPickedColor(c); notify('💉 Color sampled from panel!', c, 2000); }
+  else    { notify('No panel nearby! Get closer to a colored wall.', '#ef4444', 2000); }
+}
+
+function toggleColorPicker() {
+  colorPickerOpen = !colorPickerOpen;
+  document.getElementById('color-panel').classList.toggle('hidden', !colorPickerOpen);
+  if (colorPickerOpen) {
+    document.exitPointerLock?.();
+    if (!_cwCtx) initColorWheel();
+    document.getElementById('color-preview-box').style.background = myColor;
+    document.getElementById('color-hex-inp').value = myColor;
+  }
+}
+function closeColorPicker() {
+  colorPickerOpen = false;
+  document.getElementById('color-panel').classList.add('hidden');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  POSE SYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+const POSES = [
+  { id:'stand',   icon:'🧍', name:'Stand',       fn: applyPoseStand },
+  { id:'crouch',  icon:'🧎', name:'Crouch',      fn: applyPoseCrouch },
+  { id:'sit',     icon:'🪑', name:'Sit',         fn: applyPoseSit },
+  { id:'lie',     icon:'🛌', name:'Lie Down',    fn: applyPoseLie },
+  { id:'sleep',   icon:'😴', name:'Sleep',       fn: applyPoseSleep },
+  { id:'wave',    icon:'👋', name:'Wave',        fn: applyPoseWave },
+  { id:'point',   icon:'👉', name:'Point',       fn: applyPosePoint },
+  { id:'flex',    icon:'💪', name:'Flex',        fn: applyPoseFlex },
+  { id:'dance',   icon:'🕺', name:'Dance',       fn: applyPoseDance },
+  { id:'tpose',   icon:'✈️', name:'T-Pose',      fn: applyPoseTpose },
+  { id:'clap',    icon:'👏', name:'Clap',        fn: applyPoseClap },
+  { id:'yoga',    icon:'🧘', name:'Meditate',    fn: applyPoseYoga },
+  { id:'lean',    icon:'😮', name:'Lean Back',   fn: applyPoseLean },
+];
+
+let currentPoseId = 'stand';
+let poseWheelOpen = false;
+let poseAnimTimer = 0;
+
+function initPoseWheel() {
+  const list = document.getElementById('pose-list');
+  list.innerHTML = '';
+  POSES.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'pose-btn' + (p.id === currentPoseId ? ' active' : '');
+    btn.id = 'pose-btn-' + p.id;
+    btn.innerHTML = `<span class="pose-icon">${p.icon}</span>${p.name}`;
+    btn.onclick = () => selectPose(p.id);
+    list.appendChild(btn);
+  });
+}
+
+function selectPose(id) {
+  currentPoseId = id;
+  document.querySelectorAll('.pose-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('pose-btn-' + id);
+  if (btn) btn.classList.add('active');
+  const pose = POSES.find(p => p.id === id);
+  if (pose) pose.fn(playerMeshes.get(myId));
+  
+  // Update Physics Hitbox
+  if (playerBody && playerBody.shapes.length > 0) {
+    let newR = 0.4;
+    if (id === 'crouch' || id === 'sit' || id === 'yoga') newR = 0.25;
+    if (id === 'lie' || id === 'sleep' || id === 'lean') newR = 0.15;
+    
+    playerBody.shapes[0].radius = newR;
+    playerBody.shapes[0].updateBoundingSphereRadius();
+    playerBody.updateBoundingRadius();
+  }
+
+  socket.emit('player_pose', { pose: id });
+  playSFX('pose');
+  notify(POSES.find(p=>p.id===id)?.icon + ' Pose: ' + POSES.find(p=>p.id===id)?.name, '#a78bfa', 1500);
+}
+
+function applyPoseToGroup(group, overrides) {
+  const defaults = {
+    rootY:0, rootScaleY:1, rootRotX:0,
+    armLX:0, armLZ:0, armRX:0, armRZ:0,
+    elbowL:0, elbowR:0,
+    legLX:0, legRX:0, kneeL:0, kneeR:0,
+    headX:0,
+  };
+  const o = {...defaults, ...overrides};
+  const animRoot  = group?.getObjectByName('animRoot');
+  const headPivot = group?.getObjectByName('headPivot');
+  const armPivotL = group?.getObjectByName('armPivotL');
+  const armPivotR = group?.getObjectByName('armPivotR');
+  const elbowLObj = group?.getObjectByName('elbowL');
+  const elbowRObj = group?.getObjectByName('elbowR');
+  const legPivotL = group?.getObjectByName('legPivotL');
+  const legPivotR = group?.getObjectByName('legPivotR');
+  const kneeLObj  = group?.getObjectByName('kneeL');
+  const kneeRObj  = group?.getObjectByName('kneeR');
+  if (animRoot)  { animRoot.position.y = o.rootY; animRoot.scale.y = o.rootScaleY; animRoot.rotation.x = o.rootRotX; animRoot.rotation.z = 0; }
+  if (headPivot) { headPivot.rotation.x = o.headX; headPivot.rotation.z = 0; }
+  if (armPivotL) { armPivotL.rotation.x = o.armLX; armPivotL.rotation.z = o.armLZ; }
+  if (armPivotR) { armPivotR.rotation.x = o.armRX; armPivotR.rotation.z = o.armRZ; }
+  if (elbowLObj) elbowLObj.rotation.x = o.elbowL;
+  if (elbowRObj) elbowRObj.rotation.x = o.elbowR;
+  if (legPivotL) legPivotL.rotation.x = o.legLX;
+  if (legPivotR) legPivotR.rotation.x = o.legRX;
+  if (kneeLObj)  kneeLObj.rotation.x  = o.kneeL;
+  if (kneeRObj)  kneeRObj.rotation.x  = o.kneeR;
+}
+
+function applyPoseStand(g)  { applyPoseToGroup(g, {}); }
+function applyPoseCrouch(g) { applyPoseToGroup(g, { rootY:-0.28, rootScaleY:0.78, legLX:0.7, legRX:0.7, kneeL:0.9, kneeR:0.9, armLX:0.2, armRX:0.2 }); }
+function applyPoseSit(g)    { applyPoseToGroup(g, { rootY:-0.38, rootScaleY:0.85, legLX:1.5, legRX:1.5, kneeL:-1.0, kneeR:-1.0, armLX:0.15, armRX:0.15 }); }
+function applyPoseLie(g)    { applyPoseToGroup(g, { rootRotX: Math.PI/2 * 0.9, rootY:-0.55, armLX:0.3, armRX:0.3 }); }
+function applyPoseSleep(g)  { applyPoseToGroup(g, { rootRotX: Math.PI/2, rootY:-0.6, armLX:0.3, armRX:0.3, headX:0.3 }); }
+function applyPoseWave(g)   { applyPoseToGroup(g, { armRX:-1.8, armRZ:-0.5, elbowR:-0.5 }); }
+function applyPosePoint(g)  { applyPoseToGroup(g, { armRX:-1.2, elbowR:0.1 }); }
+function applyPoseFlex(g)   { applyPoseToGroup(g, { armLX:-1.6, armLZ: 0.7, armRX:-1.6, armRZ:-0.7, elbowL:-1.2, elbowR:-1.2 }); }
+function applyPoseDance(g)  { applyPoseToGroup(g, { armLX:-0.9, armLZ:0.6, armRX:-1.5, armRZ:-0.3, legLX:-0.5, kneeL:0.4 }); }
+function applyPoseTpose(g)  { applyPoseToGroup(g, { armLX:0, armLZ:1.5, armRX:0, armRZ:-1.5 }); }
+function applyPoseClap(g)   { applyPoseToGroup(g, { armLX:-1.3, armLZ:0.35, armRX:-1.3, armRZ:-0.35, elbowL:-0.5, elbowR:-0.5 }); }
+function applyPoseYoga(g)   { applyPoseToGroup(g, { rootY:-0.35, rootScaleY:0.82, legLX:1.3, legRX:1.3, kneeL:-0.7, kneeR:-0.7, armLX:-1.8, armLZ:1.2, armRX:-1.8, armRZ:-1.2 }); }
+function applyPoseLean(g)   { applyPoseToGroup(g, { rootRotX:-0.35, headX:0.35 }); }
+
+function togglePoseWheel() {
+  poseWheelOpen = !poseWheelOpen;
+  document.getElementById('pose-wheel').classList.toggle('hidden', !poseWheelOpen);
+  if (poseWheelOpen) {
+    document.exitPointerLock?.();
+    initPoseWheel();
+  }
+}
+function closePoseWheel() {
+  poseWheelOpen = false;
+  document.getElementById('pose-wheel').classList.add('hidden');
 }
 
 function updateCamera() {
@@ -1025,7 +1654,7 @@ function initSocket() {
     }
   });
 
-  socket.on('game_start', ({map}) => {
+  socket.on('game_start', ({map, phase}) => {
     buildMap(map);
     playerMeshGroup.clear();
     playerMeshes.clear();
@@ -1034,31 +1663,47 @@ function initSocket() {
     playerBody.position.set(0, 3, 0);
     playerBody.velocity.set(0, 0, 0);
     
-    gamePhase = 'playing';
+    gamePhase = phase; // 'hide_time'
     hideAllOv();
     document.getElementById('hud').style.display='';
     document.getElementById('lock-notice').classList.add('show');
+    
+    // Apply blindfold to Hunter during hide_time
+    if (phase === 'hide_time' && !iAmChameleon) {
+      document.getElementById('blindfold').classList.add('show');
+    } else {
+      document.getElementById('blindfold').classList.remove('show');
+    }
+    
     myCaught = false;
     blendLevel = 0;
+  });
+  
+  socket.on('phase_change', ({phase}) => {
+    gamePhase = phase;
+    if (phase === 'playing') {
+      document.getElementById('blindfold').classList.remove('show');
+      notify('GO! The hunt has begun!', '#ef4444', 3000);
+    }
   });
 
   socket.on('role_info', ({isChameleon}) => {
     iAmChameleon = isChameleon;
-    myColor = isChameleon ? '#22c55e' : '#3b82f6';
+    myColor = isChameleon ? '#22c55e' : '#ef4444';
 
     const badge = document.getElementById('hud-role-badge');
     if (isChameleon) {
-      badge.textContent = '🦎 CHAMELEON';
+      badge.innerHTML = '🦎 CHAMELEON';
       badge.style.cssText = 'border-color:rgba(34,197,94,0.6);background:rgba(34,197,94,0.1);color:#86efad';
       document.getElementById('blend-wrap').classList.remove('hidden');
       document.getElementById('crosshair').style.display='none';
-      notify('🦎 You are the CHAMELEON! Blend in using [E] key!','#86efad',5000);
+      notify('🦎 You are a CHAMELEON! Hide from the Hunter!','#86efad',5000);
     } else {
-      badge.textContent = '🕵️ Hunter';
-      badge.style.cssText = 'border-color:rgba(59,130,246,0.6);background:rgba(59,130,246,0.1);color:#60a5fa';
+      badge.innerHTML = '🕵️ HUNTER';
+      badge.style.cssText = 'border-color:rgba(239,68,68,0.6);background:rgba(239,68,68,0.1);color:#fca5a5';
       document.getElementById('blend-wrap').classList.add('hidden');
       document.getElementById('crosshair').style.display='';
-      notify('🕵️ You are a HUNTER! Click to catch the Chameleon!','#60a5fa',5000);
+      notify('🕵️ You are the HUNTER! Catch all chameleons!','#fca5a5',5000);
     }
   });
 
@@ -1066,8 +1711,25 @@ function initSocket() {
     const tEl = document.getElementById('hud-timer');
     tEl.textContent = timer;
     tEl.classList.toggle('urgent', timer <= 15);
+    document.getElementById('hud-phase').textContent = gamePhase === 'hide_time' ? 'HIDE TIME' : 'PLAYING';
 
     players.forEach(pd => syncPlayer(pd));
+
+    // Live Player List UI
+    const plist = document.getElementById('player-list');
+    if (plist) {
+      plist.innerHTML = players.map(p => {
+        const roleIcon = !p.isChameleon ? '🕵️' : '🦎';
+        const isHunterCls = !p.isChameleon ? ' hunter' : '';
+        const poseObj = POSES.find(x => x.id === (p.pose || 'stand'));
+        const poseIcon = p.isChameleon && poseObj ? poseObj.icon : '';
+        const me = p.id === myId ? ' (You)' : '';
+        return `<div class="pl-item${isHunterCls}">
+          <div class="pl-name"><span class="pl-icon">${roleIcon}</span> ${esc(p.username)}${me}</div>
+          <div>${poseIcon}</div>
+        </div>`;
+      }).join('');
+    }
 
     const ids = new Set(players.map(p=>p.id));
     for (const [id, grp] of playerMeshes) {
@@ -1116,6 +1778,7 @@ function initSocket() {
 function doCreate() {
   const name = document.getElementById('cu').value.trim();
   if (!name) { notify('Enter name!','#ef4444'); return; }
+  initAudio();
   initSocket();
   myUsername = name;
   socket.emit('create_room',{username:name, mapId:selectedMapId}, res => {
@@ -1131,6 +1794,7 @@ function doJoin() {
   const code = document.getElementById('jc').value.trim().toUpperCase();
   if (!name) { notify('Enter name!','#ef4444'); return; }
   if (code.length!==4) { notify('4-letter room code!','#ef4444'); return; }
+  initAudio();
   initSocket();
   myUsername = name;
   socket.emit('join_room',{username:name,roomCode:code}, res => {
@@ -1149,16 +1813,16 @@ function leaveRoom() { socket?.disconnect(); window.location.reload(); }
 //  RESULTS INTERFACES
 // ─────────────────────────────────────────────────────────────────────────────
 function showEndScreen(data) {
-  const {chameleonWins, chameleonName, catcherName, players} = data;
+  const {chameleonWins, players} = data;
 
-  document.getElementById('end-icon').textContent = chameleonWins ? '🦎' : '🎉';
+  document.getElementById('end-icon').textContent = chameleonWins ? '🦎' : '🕵️';
   document.getElementById('end-title').innerHTML = chameleonWins
-    ? '<span style="background:linear-gradient(135deg,#f472b6,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Chameleon Wins!</span>'
-    : '<span style="background:linear-gradient(135deg,#22c55e,#86efad);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Hunters Win!</span>';
+    ? '<span style="background:linear-gradient(135deg,#22c55e,#86efad);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Chameleons Win!</span>'
+    : '<span style="background:linear-gradient(135deg,#ef4444,#fca5a5);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Hunters Win!</span>';
 
   document.getElementById('end-sub').textContent = chameleonWins
-    ? `The Chameleon (${chameleonName}) escaped undetected!`
-    : `${catcherName} detected the Chameleon (${chameleonName})!`;
+    ? `The Chameleons survived the time limit!`
+    : `The Hunters caught everyone!`;
 
   const sorted = [...players].sort((a,b)=>b.score-a.score);
   const medals = ['🥇','🥈','🥉'];

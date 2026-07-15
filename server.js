@@ -1,860 +1,321 @@
 'use strict';
 
 const express = require('express');
-const http = require('http');
+const http    = require('http');
 const { Server } = require('socket.io');
-const path = require('path');
+const path    = require('path');
 
-const app = express();
+const app    = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: { origin: '*' },
-  pingTimeout: 60000,
-  pingInterval: 25000,
-});
+const io     = new Server(server, { cors: { origin: '*' }, pingTimeout: 60000 });
+const PORT   = process.env.PORT || 3000;
 
-const PORT = process.env.PORT || 3000;
-
-// Ensure UTF-8 charset on all responses
-app.use((req, res, next) => {
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  next();
-});
-
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-//  WORD POOL  (12 topics, each 4Ã—4 = 16 words)
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const TOPICS = [
+// ─────────────────────────────────────────────
+//  MAPS
+// ─────────────────────────────────────────────
+const MAPS = [
   {
-    name: 'Animals',
-    emoji: 'ğŸ¾',
-    words: [
-      ['Lion',    'Tiger',   'Elephant', 'Giraffe'],
-      ['Penguin', 'Dolphin', 'Eagle',    'Shark'],
-      ['Cheetah', 'Gorilla', 'Flamingo', 'Crocodile'],
-      ['Kangaroo','Panda',   'Cobra',    'Parrot'],
+    id: 'arcade', name: 'Arcade', emoji: '🕹️',
+    fogColor: '#0a0018', floorColor: '#08000f', wallColor: '#0d0018',
+    panels: [
+      { x:-15.9, y:1.8, z: 0,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#ff0080' },
+      { x:-15.9, y:1.8, z: 9,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#00ffff' },
+      { x:-15.9, y:1.8, z:-9,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#ffff00' },
+      { x: 15.9, y:1.8, z: 0,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#00ff80' },
+      { x: 15.9, y:1.8, z: 9,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#ff8000' },
+      { x: 15.9, y:1.8, z:-9,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#a020f0' },
+      { x: 0,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#ff4040' },
+      { x: 9,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#40ff40' },
+      { x:-9,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#4040ff' },
+      { x: 0,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#ff40ff' },
+      { x: 9,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#40ffff' },
+      { x:-9,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#ffff40' },
+    ],
+    obstacles: [
+      { x:6, z:6, w:2, h:2.5, d:2 }, { x:-6, z:6, w:2, h:2.5, d:2 },
+      { x:6, z:-6, w:2, h:2.5, d:2 }, { x:-6, z:-6, w:2, h:2.5, d:2 },
+      { x:0, z:0, w:3, h:1, d:3 },
     ],
   },
   {
-    name: 'Food & Drink',
-    emoji: 'ğŸ•',
-    words: [
-      ['Pizza',   'Sushi',   'Tacos',    'Burger'],
-      ['Ramen',   'Steak',   'Lobster',  'Spaghetti'],
-      ['Tiramisu','Croissant','Mango',   'Avocado'],
-      ['Whiskey', 'Espresso','Champagne','Lemonade'],
+    id: 'forest', name: 'Forest', emoji: '🌲',
+    fogColor: '#051005', floorColor: '#081208', wallColor: '#0a180a',
+    panels: [
+      { x:-15.9, y:1.8, z: 0,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#2d7a1b' },
+      { x:-15.9, y:1.8, z: 9,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#7a4a1b' },
+      { x:-15.9, y:1.8, z:-9,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#1b5c1b' },
+      { x: 15.9, y:1.8, z: 0,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#b0901a' },
+      { x: 15.9, y:1.8, z: 9,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#4a8a4a' },
+      { x: 15.9, y:1.8, z:-9,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#8a6030' },
+      { x: 0,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#3a7a3a' },
+      { x: 9,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#6a5020' },
+      { x:-9,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#2a6a2a' },
+      { x: 0,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#5a9a3a' },
+      { x: 9,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#9a6a30' },
+      { x:-9,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#3a6a3a' },
+    ],
+    obstacles: [
+      { x:7, z:4, w:1.5, h:5, d:1.5 }, { x:-7, z:4, w:1.5, h:5, d:1.5 },
+      { x:4, z:-7, w:1.5, h:5, d:1.5 }, { x:-4, z:-7, w:1.5, h:5, d:1.5 },
+      { x:0, z:0, w:2, h:4, d:2 }, { x:9, z:-3, w:1.5, h:3, d:1.5 },
     ],
   },
   {
-    name: 'Countries',
-    emoji: 'ğŸŒ',
-    words: [
-      ['Japan',   'Brazil',  'Germany',  'Egypt'],
-      ['Canada',  'India',   'Argentina','Nigeria'],
-      ['France',  'Mexico',  'Australia','Thailand'],
-      ['Iceland', 'Morocco', 'Colombia', 'Sweden'],
+    id: 'space', name: 'Space Station', emoji: '🚀',
+    fogColor: '#000008', floorColor: '#05050f', wallColor: '#080818',
+    panels: [
+      { x:-15.9, y:1.8, z: 0,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#1a1a8a' },
+      { x:-15.9, y:1.8, z: 9,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#8a1a8a' },
+      { x:-15.9, y:1.8, z:-9,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#1a8a8a' },
+      { x: 15.9, y:1.8, z: 0,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#5a5aaa' },
+      { x: 15.9, y:1.8, z: 9,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#aa1a5a' },
+      { x: 15.9, y:1.8, z:-9,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#1aaa5a' },
+      { x: 0,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#6a2aaa' },
+      { x: 9,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#aa6a1a' },
+      { x:-9,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#2aaaaa' },
+      { x: 0,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#aa2aaa' },
+      { x: 9,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#2a6aaa' },
+      { x:-9,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#aaaa2a' },
     ],
-  },
-  {
-    name: 'Movies',
-    emoji: 'ğŸ¬',
-    words: [
-      ['Inception','Avatar',   'Titanic',  'Gladiator'],
-      ['Parasite', 'Interstellar','Joker', 'Frozen'],
-      ['Matrix',   'Alien',    'Casablanca','Grease'],
-      ['Dunkirk',  'Coco',     'Jaws',     'Rocky'],
-    ],
-  },
-  {
-    name: 'Sports',
-    emoji: 'âš½',
-    words: [
-      ['Football', 'Basketball','Tennis',  'Swimming'],
-      ['Baseball', 'Volleyball','Golf',    'Boxing'],
-      ['Wrestling','Cycling',   'Skiing',  'Archery'],
-      ['Surfing',  'Fencing',   'Rowing',  'Judo'],
-    ],
-  },
-  {
-    name: 'Superheroes',
-    emoji: 'ğŸ¦¸',
-    words: [
-      ['Superman', 'Batman',   'Spider-Man','Wonder Woman'],
-      ['Iron Man', 'Thor',     'Hulk',      'Captain America'],
-      ['Flash',    'Aquaman',  'Black Panther','Wolverine'],
-      ['Deadpool', 'Ant-Man',  'Doctor Strange','Hawkeye'],
-    ],
-  },
-  {
-    name: 'Musical Instruments',
-    emoji: 'ğŸ¸',
-    words: [
-      ['Guitar',   'Piano',    'Violin',   'Drums'],
-      ['Trumpet',  'Flute',    'Cello',    'Saxophone'],
-      ['Harp',     'Clarinet', 'Trombone', 'Ukulele'],
-      ['Banjo',    'Accordion','Oboe',     'Marimba'],
-    ],
-  },
-  {
-    name: 'Cities',
-    emoji: 'ğŸ™ï¸',
-    words: [
-      ['Tokyo',    'Paris',   'New York', 'London'],
-      ['Dubai',    'Sydney',  'Istanbul', 'Rome'],
-      ['Barcelona','Berlin',  'Cairo',    'Mumbai'],
-      ['Bangkok',  'Toronto', 'Madrid',   'Singapore'],
-    ],
-  },
-  {
-    name: 'Video Games',
-    emoji: 'ğŸ®',
-    words: [
-      ['Minecraft','Fortnite', 'Roblox',    'FIFA'],
-      ['GTA',      'Zelda',    'PokÃ©mon',   'Halo'],
-      ['Valorant', 'Among Us', 'Elden Ring','Tetris'],
-      ['Mario',    'Doom',     'Cyberpunk', 'Sims'],
-    ],
-  },
-  {
-    name: 'Fashion Brands',
-    emoji: 'ğŸ‘—',
-    words: [
-      ['Nike',    'Gucci',   'Zara',    'Adidas'],
-      ['Prada',   'H&M',     'Chanel',  'Versace'],
-      ['Balenciaga','Louis Vuitton','Dior','Supreme'],
-      ['Off-White','Fendi',  'Burberry','Givenchy'],
-    ],
-  },
-  {
-    name: 'Science',
-    emoji: 'ğŸ§ª',
-    words: [
-      ['Gravity',  'Atom',    'DNA',     'Laser'],
-      ['Quantum',  'Plasma',  'Neuron',  'Enzyme'],
-      ['Eclipse',  'Fossil',  'Vaccine', 'Magnet'],
-      ['Proton',   'Photon',  'Crystal', 'Comet'],
-    ],
-  },
-  {
-    name: 'Things at a Party',
-    emoji: 'ğŸ‰',
-    words: [
-      ['Balloons', 'Confetti','DJ',      'Dance Floor'],
-      ['Cocktails','Karaoke', 'Streamers','Birthday Cake'],
-      ['Snapchat', 'Glitter', 'Fireworks','Photo Booth'],
-      ['Playlist', 'Bouncer', 'Selfie',  'After Party'],
+    obstacles: [
+      { x:5, z:5, w:2, h:3, d:2 }, { x:-5, z:5, w:2, h:3, d:2 },
+      { x:5, z:-5, w:2, h:3, d:2 }, { x:-5, z:-5, w:2, h:3, d:2 },
+      { x:0, z:0, w:4, h:1.5, d:4 }, { x:0, z:9, w:2, h:2, d:2 }, { x:0, z:-9, w:2, h:2, d:2 },
     ],
   },
 ];
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-//  IN-MEMORY STATE
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const GAME_DURATION = 90;
 const rooms = new Map();
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────
 //  HELPERS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function generateRoomCode() {
+// ─────────────────────────────────────────────
+function generateCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
   let code;
-  do {
-    code = Array.from({ length: 4 }, () =>
-      chars[Math.floor(Math.random() * chars.length)]
-    ).join('');
-  } while (rooms.has(code));
+  do { code = Array.from({length:4},()=>chars[Math.floor(Math.random()*chars.length)]).join(''); }
+  while (rooms.has(code));
   return code;
 }
+function pickRandom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+function getRoom(socket) { return rooms.get(socket.data.roomCode); }
 
-function pickRandom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+function broadcastLobby(room) {
+  io.to(room.code).emit('lobby_state', {
+    code: room.code, hostId: room.hostId, mapId: room.mapId,
+    players: [...room.players.values()].map(p => ({
+      id:p.id, username:p.username, ready:p.ready, score:p.score,
+    })),
+  });
 }
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+function broadcastGame(room) {
+  io.to(room.code).emit('game_tick', {
+    players: [...room.players.values()].map(p => ({
+      id:p.id, x:p.x, y:p.y, z:p.z, rotY:p.rotY,
+      color:p.color, blendLevel:p.blendLevel,
+      isChameleon:p.isChameleon, caught:p.caught,
+      username:p.username,
+    })),
+    timer: room.timer,
+  });
 }
 
-function colLetter(col) {
-  return String.fromCharCode(65 + col);
-}
+function startGame(room) {
+  const players = [...room.players.values()];
+  const cham = pickRandom(players);
+  const map  = MAPS.find(m=>m.id===room.mapId) || MAPS[0];
 
-function roomPublicState(room) {
-  const players = [];
-  for (const [id, p] of room.players) {
-    players.push({
-      id,
-      username: p.username,
-      ready: p.ready,
-      connected: p.connected,
-      score: room.scores.get(id) ?? 0,
+  const spawns = [
+    {x:0,z:0},{x:5,z:5},{x:-5,z:5},{x:5,z:-5},{x:-5,z:-5},
+    {x:0,z:8},{x:8,z:0},{x:-8,z:0},
+  ];
+
+  players.forEach((p, i) => {
+    const sp = spawns[i % spawns.length];
+    Object.assign(p, {
+      isChameleon: p.id === cham.id,
+      caught: false, blendLevel: 0,
+      color: p.id === cham.id ? '#22c55e' : '#60a5fa',
+      x: sp.x, y: 0.9, z: sp.z, rotY: 0,
     });
-  }
-  return {
-    code: room.code,
-    hostId: room.hostId,
-    phase: room.phase,
-    players,
-    roundNumber: room.roundNumber,
-    topic: room.topic ? room.topic.name : null,
-    topicEmoji: room.topic ? room.topic.emoji : null,
-    grid: room.topic ? room.topic.words : null,
-    turnOrder: room.turnOrder,
-    currentTurnIndex: room.currentTurnIndex,
-    clues: room.clues ? Object.fromEntries(room.clues) : {},
-    votes: room.votes ? Object.fromEntries(room.votes) : {},
-    devMode: room.devMode || false,
-  };
+    const sock = io.sockets.sockets.get(p.id);
+    if (sock) sock.emit('role_info', { isChameleon: p.isChameleon, map });
+  });
+
+  room.phase      = 'playing';
+  room.timer      = GAME_DURATION;
+  room.chameleonId = cham.id;
+
+  io.to(room.code).emit('game_start', { map, mapId: room.mapId });
+  broadcastGame(room);
+
+  room.timerInterval = setInterval(() => {
+    room.timer = Math.max(0, room.timer - 1);
+    if (room.timer <= 0) { clearInterval(room.timerInterval); room.timerInterval = null; endGame(room,'timeout',null); }
+  }, 1000);
 }
 
-function privatePlayerInfo(room, socketId) {
-  const isChameleon = room.chameleonId === socketId;
-  // In dev mode, reveal everything to everyone
-  if (room.devMode) {
-    return {
-      role: isChameleon ? 'chameleon' : 'innocent',
-      secretCoord: room.secretCoord,
-      secretWord: room.secretWord,
-      chameleonId: room.chameleonId,
-      devMode: true,
-      allTopics: TOPICS.map(t => t.name),
-    };
-  }
-  return {
-    role: isChameleon ? 'chameleon' : 'innocent',
-    secretCoord: isChameleon ? null : room.secretCoord,
-    secretWord: isChameleon ? null : room.secretWord,
-    chameleonId: null,
-  };
-}
-
-function broadcastRoomState(room) {
-  io.to(room.code).emit('room_state', roomPublicState(room));
-}
-
-function getConnectedPlayers(room) {
-  return [...room.players.values()].filter((p) => p.connected);
-}
-
-function cleanupRoom(roomCode) {
-  const room = rooms.get(roomCode);
-  if (!room) return;
-  if (room.guessTimer) clearTimeout(room.guessTimer);
-  for (const p of room.players.values()) {
-    if (p.disconnectTimeout) clearTimeout(p.disconnectTimeout);
-  }
-  rooms.delete(roomCode);
-  console.log(`[Room ${roomCode}] Cleaned up.`);
-}
-
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-//  GAME LOGIC
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function startRound(room) {
-  const topic = pickRandom(TOPICS);
-  const row = Math.floor(Math.random() * 4);
-  const col = Math.floor(Math.random() * 4);
-  const secretWord = topic.words[row][col];
-
-  const connected = getConnectedPlayers(room);
-  const chameleon = pickRandom(connected);
-  const turnOrder = shuffle(connected.map((p) => p.id));
-
-  room.topic = topic;
-  room.secretCoord = { row, col, label: `${colLetter(col)}${row + 1}` };
-  room.secretWord = secretWord;
-  room.chameleonId = chameleon.id;
-  room.clues = new Map();
-  room.votes = new Map();
-  room.turnOrder = turnOrder;
-  room.currentTurnIndex = 0;
-  room.phase = 'describing';
-  room.roundNumber = (room.roundNumber || 0) + 1;
-  if (room.guessTimer) { clearTimeout(room.guessTimer); room.guessTimer = null; }
-
-  console.log(
-    `[Room ${room.code}]${room.devMode ? ' [DEV]' : ''} Round ${room.roundNumber} started. Topic: ${topic.name}, Secret: ${secretWord} (${room.secretCoord.label}), Chameleon: ${chameleon.username}`
-  );
-
-  broadcastRoomState(room);
-
-  for (const [sid] of room.players) {
-    const socket = io.sockets.sockets.get(sid);
-    if (socket) {
-      socket.emit('private_info', privatePlayerInfo(room, sid));
-    }
-  }
-
-  announceTurn(room);
-}
-
-function announceTurn(room) {
-  if (room.phase !== 'describing') return;
-  const currentId = room.turnOrder[room.currentTurnIndex];
-  io.to(room.code).emit('your_turn', { currentPlayerId: currentId });
-}
-
-function advanceTurn(room) {
-  room.currentTurnIndex++;
-  if (room.currentTurnIndex >= room.turnOrder.length) {
-    startVoting(room);
-  } else {
-    broadcastRoomState(room);
-    announceTurn(room);
-  }
-}
-
-function startVoting(room) {
-  room.phase = 'voting';
-  room.votes = new Map();
-  broadcastRoomState(room);
-  io.to(room.code).emit('phase_change', { phase: 'voting' });
-}
-
-function checkVotingComplete(room) {
-  const connected = getConnectedPlayers(room);
-  const voted = [...room.votes.keys()].filter((id) => room.players.has(id));
-  if (voted.length >= connected.length) {
-    resolveVoting(room);
-  }
-}
-
-function resolveVoting(room) {
-  const tally = {};
-  for (const [, suspect] of room.votes) {
-    tally[suspect] = (tally[suspect] || 0) + 1;
-  }
-
-  let maxVotes = 0;
-  let votedOutId = null;
-  for (const [pid, count] of Object.entries(tally)) {
-    if (count > maxVotes) {
-      maxVotes = count;
-      votedOutId = pid;
-    } else if (count === maxVotes) {
-      votedOutId = null;
-    }
-  }
-
-  const chameleonCaught = votedOutId === room.chameleonId;
-
-  if (!chameleonCaught) {
-    room.phase = 'reveal';
-    const chameleon = room.players.get(room.chameleonId);
-    addScore(room, room.chameleonId, 3);
-    broadcastRoomState(room);
-    io.to(room.code).emit('reveal', {
-      chameleonId: room.chameleonId,
-      chameleonName: chameleon?.username ?? '?',
-      secretWord: room.secretWord,
-      secretCoord: room.secretCoord,
-      result: 'chameleon_wins_vote',
-      votedOutId,
-      tally,
-      scores: Object.fromEntries(room.scores),
-    });
-  } else {
-    room.phase = 'chameleon_guess';
-    broadcastRoomState(room);
-
-    const chameleon = room.players.get(room.chameleonId);
-    io.to(room.code).emit('chameleon_caught', {
-      chameleonId: room.chameleonId,
-      chameleonName: chameleon?.username ?? '?',
-      votedOutId,
-      tally,
-    });
-
-    let secondsLeft = 15;
-    const interval = setInterval(() => {
-      secondsLeft--;
-      io.to(room.code).emit('guess_timer', { secondsLeft });
-      if (secondsLeft <= 0) {
-        clearInterval(interval);
-        room.guessTimer = null;
-        resolveGuess(room, null);
-      }
-    }, 1000);
-
-    room.guessTimer = interval;
-
-    const chameleonSocket = io.sockets.sockets.get(room.chameleonId);
-    if (chameleonSocket) {
-      chameleonSocket.emit('request_guess', {
-        grid: room.topic.words,
-        secondsLeft: 15,
-      });
-    }
-  }
-}
-
-function resolveGuess(room, guess) {
-  if (room.guessTimer) { clearInterval(room.guessTimer); room.guessTimer = null; }
-  if (room.phase !== 'chameleon_guess') return;
-  room.phase = 'reveal';
-
-  const correct =
-    guess !== null &&
-    guess.trim().toLowerCase() === room.secretWord.toLowerCase();
-
-  const chameleonWins = correct;
-  const chameleonPlayer = room.players.get(room.chameleonId);
+function endGame(room, reason, catcherId) {
+  if (room.timerInterval) { clearInterval(room.timerInterval); room.timerInterval = null; }
+  room.phase = 'ended';
+  const cham = room.players.get(room.chameleonId);
+  const chameleonWins = reason === 'timeout';
 
   if (chameleonWins) {
-    addScore(room, room.chameleonId, 2);
+    if (cham) cham.score += 3;
   } else {
-    for (const [id] of room.players) {
-      if (id !== room.chameleonId) addScore(room, id, 1);
-    }
+    for (const p of room.players.values()) if (!p.isChameleon) p.score += 1;
+    if (catcherId && room.players.has(catcherId)) room.players.get(catcherId).score += 2;
   }
 
-  broadcastRoomState(room);
-  io.to(room.code).emit('reveal', {
+  io.to(room.code).emit('game_end', {
+    reason, chameleonWins,
     chameleonId: room.chameleonId,
-    chameleonName: chameleonPlayer?.username ?? '?',
-    secretWord: room.secretWord,
-    secretCoord: room.secretCoord,
-    result: chameleonWins ? 'chameleon_wins_guess' : 'innocents_win',
-    guess,
-    correct,
-    scores: Object.fromEntries(room.scores),
+    chameleonName: cham?.username || '?',
+    catcherName: catcherId ? room.players.get(catcherId)?.username : null,
+    players: [...room.players.values()].map(p=>({id:p.id,username:p.username,score:p.score,isChameleon:p.isChameleon})),
   });
 }
 
-function addScore(room, playerId, points) {
-  room.scores.set(playerId, (room.scores.get(playerId) ?? 0) + points);
-}
-
-function resetToLobby(room) {
-  if (room.guessTimer) { clearInterval(room.guessTimer); room.guessTimer = null; }
-  room.phase = 'lobby';
-  room.topic = null;
-  room.secretCoord = null;
-  room.secretWord = null;
-  room.chameleonId = null;
-  room.clues = new Map();
-  room.votes = new Map();
-  room.turnOrder = [];
-  room.currentTurnIndex = 0;
-  for (const p of room.players.values()) p.ready = false;
-  broadcastRoomState(room);
-  io.to(room.code).emit('phase_change', { phase: 'lobby' });
-}
-
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-//  SOCKET EVENT HANDLERS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-io.on('connection', (socket) => {
-  console.log(`[Socket] Connected: ${socket.id}`);
-
-  // â”€â”€ CREATE ROOM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('create_room', ({ username, devMode }, callback) => {
-    if (!username || username.trim().length < 1) {
-      return callback({ error: 'Username is required.' });
-    }
-    const name = username.trim().slice(0, 20);
-    const code = generateRoomCode();
-
-    const room = {
-      code,
-      hostId: socket.id,
-      players: new Map(),
-      phase: 'lobby',
-      topic: null,
-      secretCoord: null,
-      secretWord: null,
-      chameleonId: null,
-      clues: new Map(),
-      votes: new Map(),
-      turnOrder: [],
-      currentTurnIndex: 0,
-      guessTimer: null,
-      roundNumber: 0,
-      scores: new Map(),
-      devMode: devMode === true,
-    };
-
-    room.players.set(socket.id, {
-      id: socket.id,
-      username: name,
-      ready: false,
-      connected: true,
-      disconnectTimeout: null,
-    });
-    room.scores.set(socket.id, 0);
-
-    rooms.set(code, room);
+// ─────────────────────────────────────────────
+//  SOCKET HANDLERS
+// ─────────────────────────────────────────────
+io.on('connection', socket => {
+  socket.on('create_room', ({username, mapId}, cb) => {
+    const name = (username||'').trim().slice(0,20);
+    if (!name) return cb({error:'Name required.'});
+    const code = generateCode();
+    const room = { code, hostId:socket.id, phase:'lobby', mapId:mapId||'arcade',
+                   players:new Map(), timer:GAME_DURATION, timerInterval:null, chameleonId:null };
+    room.players.set(socket.id,{id:socket.id,username:name,ready:false,score:0,
+      x:0,y:0.9,z:0,rotY:0,color:'#60a5fa',blendLevel:0,isChameleon:false,caught:false});
+    rooms.set(code,room);
     socket.join(code);
-    socket.data.roomCode = code;
-    socket.data.username = name;
-
-    console.log(`[Room ${code}]${room.devMode ? ' [DEV]' : ''} Created by ${name} (${socket.id})`);
-    callback({ success: true, roomCode: code, playerId: socket.id, devMode: room.devMode });
-    broadcastRoomState(room);
+    socket.data.roomCode = code; socket.data.username = name;
+    cb({success:true,roomCode:code,playerId:socket.id});
+    broadcastLobby(room);
   });
 
-  // â”€â”€ JOIN ROOM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('join_room', ({ username, roomCode }, callback) => {
-    if (!username || username.trim().length < 1) {
-      return callback({ error: 'Username is required.' });
-    }
-    const code = roomCode?.trim().toUpperCase();
+  socket.on('join_room', ({username,roomCode}, cb) => {
+    const name = (username||'').trim().slice(0,20);
+    const code = (roomCode||'').trim().toUpperCase();
+    if (!name) return cb({error:'Name required.'});
     const room = rooms.get(code);
-    if (!room) return callback({ error: 'Room not found.' });
-    if (room.phase !== 'lobby') return callback({ error: 'Game already in progress.' });
-    if (room.players.size >= 8) return callback({ error: 'Room is full (max 8 players).' });
-
-    const name = username.trim().slice(0, 20);
-    for (const p of room.players.values()) {
-      if (p.username.toLowerCase() === name.toLowerCase() && p.connected) {
-        return callback({ error: 'Username already taken in this room.' });
-      }
-    }
-
-    room.players.set(socket.id, {
-      id: socket.id,
-      username: name,
-      ready: false,
-      connected: true,
-      disconnectTimeout: null,
-    });
-    room.scores.set(socket.id, 0);
-
+    if (!room) return cb({error:'Room not found.'});
+    if (room.phase !== 'lobby') return cb({error:'Game in progress.'});
+    if (room.players.size >= 8) return cb({error:'Room full.'});
+    room.players.set(socket.id,{id:socket.id,username:name,ready:false,score:0,
+      x:0,y:0.9,z:0,rotY:0,color:'#60a5fa',blendLevel:0,isChameleon:false,caught:false});
     socket.join(code);
-    socket.data.roomCode = code;
-    socket.data.username = name;
-
-    console.log(`[Room ${code}] ${name} (${socket.id}) joined.`);
-    callback({ success: true, roomCode: code, playerId: socket.id, devMode: room.devMode });
-    broadcastRoomState(room);
-    io.to(code).emit('player_joined', { username: name });
+    socket.data.roomCode = code; socket.data.username = name;
+    cb({success:true,roomCode:code,playerId:socket.id});
+    broadcastLobby(room);
+    io.to(code).emit('chat_msg',{sys:true,msg:`${name} joined!`});
   });
 
-  // â”€â”€ TOGGLE READY â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   socket.on('toggle_ready', () => {
-    const room = rooms.get(socket.data.roomCode);
-    if (!room || room.phase !== 'lobby') return;
-    const player = room.players.get(socket.id);
-    if (!player) return;
-    player.ready = !player.ready;
-    broadcastRoomState(room);
+    const room = getRoom(socket); if (!room||room.phase!=='lobby') return;
+    const p = room.players.get(socket.id); if (!p) return;
+    p.ready = !p.ready; broadcastLobby(room);
   });
 
-  // â”€â”€ START GAME (host only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('start_game', (callback) => {
-    const cb = typeof callback === 'function' ? callback : () => {};
-    const room = rooms.get(socket.data.roomCode);
-    if (!room) return cb({ error: 'Room not found.' });
-    if (room.hostId !== socket.id) return cb({ error: 'Only the host can start the game.' });
+  socket.on('set_map', ({mapId}) => {
+    const room = getRoom(socket); if (!room||room.hostId!==socket.id) return;
+    if (MAPS.find(m=>m.id===mapId)) { room.mapId = mapId; broadcastLobby(room); }
+  });
 
-    if (room.devMode) {
-      // Dev mode: no player count or ready requirement
-      startRound(room);
-      return cb({ success: true });
+  socket.on('start_game', cb => {
+    const c = typeof cb==='function'?cb:()=>{};
+    const room = getRoom(socket);
+    if (!room) return c({error:'Room not found.'});
+    if (room.hostId!==socket.id) return c({error:'Only host can start.'});
+    if (room.players.size < 2) return c({error:'Need at least 2 players.'});
+    startGame(room); c({success:true});
+  });
+
+  socket.on('player_move', data => {
+    const room = getRoom(socket); if (!room||room.phase!=='playing') return;
+    const p = room.players.get(socket.id); if (!p||p.caught) return;
+    p.x=data.x; p.y=data.y; p.z=data.z; p.rotY=data.rotY;
+  });
+
+  socket.on('chameleon_blend', ({blendLevel,color}) => {
+    const room = getRoom(socket); if (!room||room.phase!=='playing') return;
+    const p = room.players.get(socket.id); if (!p||!p.isChameleon) return;
+    p.blendLevel = Math.max(0,Math.min(1,blendLevel));
+    if (color) p.color = color;
+  });
+
+  socket.on('hunter_click', ({targetId}) => {
+    const room = getRoom(socket); if (!room||room.phase!=='playing') return;
+    const hunter = room.players.get(socket.id);
+    const target = room.players.get(targetId);
+    if (!hunter||!target||hunter.isChameleon||target.caught) return;
+    if (!target.isChameleon) {
+      socket.emit('wrong_guess',{name:target.username});
+      return;
     }
-
-    const connected = getConnectedPlayers(room);
-    if (connected.length < 3) return cb({ error: 'Need at least 3 players to start.' });
-    const notReady = connected.filter((p) => !p.ready && p.id !== room.hostId);
-    if (notReady.length > 0) return cb({ error: 'All players must be ready.' });
-
-    startRound(room);
-    cb({ success: true });
-  });
-
-  // â”€â”€ DEV: SKIP TURN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('dev_skip_turn', (callback) => {
-    const cb = typeof callback === 'function' ? callback : () => {};
-    const room = rooms.get(socket.data.roomCode);
-    if (!room || !room.devMode) return cb({ error: 'Not in dev mode.' });
-    if (room.phase !== 'describing') return cb({ error: 'Not in describing phase.' });
-
-    const currentId = room.turnOrder[room.currentTurnIndex];
-    const fakeClues = ['Interesting', 'Unique', 'Special', 'Obvious', 'Hmm', 'Definitely', 'Classic', 'Common'];
-    const fakeClue = pickRandom(fakeClues);
-    room.clues.set(currentId, fakeClue);
-    broadcastRoomState(room);
-    cb({ success: true, clue: fakeClue });
-    advanceTurn(room);
-  });
-
-  // â”€â”€ DEV: AUTO VOTE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('dev_auto_vote', (callback) => {
-    const cb = typeof callback === 'function' ? callback : () => {};
-    const room = rooms.get(socket.data.roomCode);
-    if (!room || !room.devMode) return cb({ error: 'Not in dev mode.' });
-    if (room.phase !== 'voting') return cb({ error: 'Not in voting phase.' });
-
-    // Everyone votes randomly for someone else
-    const connected = getConnectedPlayers(room);
-    for (const player of connected) {
-      if (!room.votes.has(player.id)) {
-        const others = connected.filter(p => p.id !== player.id);
-        if (others.length > 0) {
-          room.votes.set(player.id, pickRandom(others).id);
-        }
-      }
-    }
-    broadcastRoomState(room);
-    cb({ success: true });
-    checkVotingComplete(room);
-  });
-
-  // â”€â”€ SUBMIT CLUE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('submit_clue', ({ clue }, callback) => {
-    const cb = typeof callback === 'function' ? callback : () => {};
-    const room = rooms.get(socket.data.roomCode);
-    if (!room || room.phase !== 'describing') return cb({ error: 'Not in description phase.' });
-    if (room.turnOrder[room.currentTurnIndex] !== socket.id) {
-      return cb({ error: "It's not your turn." });
-    }
-    if (!clue || clue.trim().length === 0) return cb({ error: 'Clue cannot be empty.' });
-    const word = clue.trim().split(/\s+/)[0].slice(0, 30);
-
-    room.clues.set(socket.id, word);
-    broadcastRoomState(room);
-    cb({ success: true, word });
-    advanceTurn(room);
-  });
-
-  // â”€â”€ SUBMIT VOTE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('submit_vote', ({ suspectId }, callback) => {
-    const cb = typeof callback === 'function' ? callback : () => {};
-    const room = rooms.get(socket.data.roomCode);
-    if (!room || room.phase !== 'voting') return cb({ error: 'Not in voting phase.' });
-    if (!room.players.has(suspectId)) return cb({ error: 'Invalid suspect.' });
-    if (socket.id === suspectId) return cb({ error: 'You cannot vote for yourself.' });
-    if (room.votes.has(socket.id)) return cb({ error: 'You have already voted.' });
-
-    room.votes.set(socket.id, suspectId);
-    broadcastRoomState(room);
-    cb({ success: true });
-    io.to(room.code).emit('vote_cast', {
-      voterId: socket.id,
-      voterName: room.players.get(socket.id)?.username,
+    target.caught = true;
+    io.to(room.code).emit('player_caught',{
+      caughtId:targetId, caughtName:target.username,
+      catcherId:socket.id, catcherName:hunter.username,
     });
-    checkVotingComplete(room);
+    setTimeout(()=>endGame(room,'caught',socket.id),2500);
   });
 
-  // â”€â”€ CHAMELEON GUESS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('chameleon_guess', ({ guess }, callback) => {
-    const cb = typeof callback === 'function' ? callback : () => {};
-    const room = rooms.get(socket.data.roomCode);
-    if (!room || room.phase !== 'chameleon_guess') return cb({ error: 'Not in guess phase.' });
-    if (room.chameleonId !== socket.id) return cb({ error: 'You are not the Chameleon.' });
-    if (!guess || guess.trim().length === 0) return cb({ error: 'Guess cannot be empty.' });
-
-    cb({ success: true });
-    resolveGuess(room, guess.trim());
+  socket.on('send_chat', ({message}) => {
+    const room = getRoom(socket); if (!room) return;
+    const p = room.players.get(socket.id); if (!p) return;
+    const text = (message||'').trim().slice(0,150); if (!text) return;
+    io.to(room.code).emit('chat_msg',{senderId:socket.id,senderName:p.username,msg:text});
   });
 
-  // â”€â”€ PLAY AGAIN (host only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('play_again', (callback) => {
-    const cb = typeof callback === 'function' ? callback : () => {};
-    const room = rooms.get(socket.data.roomCode);
-    if (!room) return cb({ error: 'Room not found.' });
-    if (room.hostId !== socket.id) return cb({ error: 'Only the host can start a new round.' });
-    if (!['reveal', 'chameleon_guess'].includes(room.phase)) {
-      return cb({ error: 'Game not finished yet.' });
+  socket.on('play_again', cb => {
+    const c = typeof cb==='function'?cb:()=>{};
+    const room = getRoom(socket);
+    if (!room||room.hostId!==socket.id||room.phase!=='ended') return c({error:'Cannot restart.'});
+    room.phase='lobby'; room.timer=GAME_DURATION; room.chameleonId=null;
+    for (const p of room.players.values()) {
+      p.ready=false; p.isChameleon=false; p.caught=false; p.blendLevel=0; p.color='#60a5fa';
     }
-    resetToLobby(room);
-    cb({ success: true });
+    io.to(room.code).emit('return_lobby');
+    broadcastLobby(room); c({success:true});
   });
 
-  // â”€â”€ KICK PLAYER (host only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('kick_player', ({ playerId }, callback) => {
-    const cb = typeof callback === 'function' ? callback : () => {};
-    const room = rooms.get(socket.data.roomCode);
-    if (!room) return cb({ error: 'Room not found.' });
-    if (room.hostId !== socket.id) return cb({ error: 'Only the host can kick players.' });
-    if (!room.players.has(playerId)) return cb({ error: 'Player not found.' });
-    if (playerId === socket.id) return cb({ error: 'Cannot kick yourself.' });
-
-    const kicked = room.players.get(playerId);
-    room.players.delete(playerId);
-    room.scores.delete(playerId);
-
-    const kickedSocket = io.sockets.sockets.get(playerId);
-    if (kickedSocket) {
-      kickedSocket.emit('kicked', { message: 'You were kicked from the room.' });
-      kickedSocket.leave(room.code);
+  socket.on('disconnect', () => {
+    const room = getRoom(socket); if (!room) return;
+    const p = room.players.get(socket.id);
+    room.players.delete(socket.id);
+    if (p) io.to(room.code).emit('chat_msg',{sys:true,msg:`${p.username} left.`});
+    if (room.players.size===0) {
+      if (room.timerInterval) clearInterval(room.timerInterval);
+      rooms.delete(room.code); return;
     }
-
-    io.to(room.code).emit('player_left', { username: kicked?.username, kicked: true });
-    broadcastRoomState(room);
-    cb({ success: true });
-  });
-
-  // â”€â”€ SEND CHAT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('send_chat', ({ message }) => {
-    const room = rooms.get(socket.data.roomCode);
-    if (!room) return;
-    const player = room.players.get(socket.id);
-    if (!player) return;
-    const text = (message || '').trim().slice(0, 200);
-    if (!text) return;
-    io.to(room.code).emit('chat_message', {
-      senderId: socket.id,
-      senderName: player.username,
-      message: text,
-      timestamp: Date.now(),
-    });
-  });
-
-  // â”€â”€ DISCONNECT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('disconnect', (reason) => {
-    console.log(`[Socket] Disconnected: ${socket.id} (${reason})`);
-    const roomCode = socket.data.roomCode;
-    if (!roomCode) return;
-    const room = rooms.get(roomCode);
-    if (!room) return;
-
-    const player = room.players.get(socket.id);
-    if (!player) return;
-    player.connected = false;
-
-    io.to(roomCode).emit('player_disconnected', { username: player.username });
-    broadcastRoomState(room);
-
-    player.disconnectTimeout = setTimeout(() => {
-      if (room.players.has(socket.id)) {
-        const connectedNow = room.players.get(socket.id);
-        if (connectedNow && !connectedNow.connected) {
-          room.players.delete(socket.id);
-          room.scores.delete(socket.id);
-          io.to(roomCode).emit('player_left', { username: player.username });
-
-          if (room.hostId === socket.id) {
-            const remaining = [...room.players.keys()];
-            if (remaining.length > 0) {
-              room.hostId = remaining[0];
-              io.to(roomCode).emit('host_changed', {
-                newHostId: room.hostId,
-                newHostName: room.players.get(room.hostId)?.username,
-              });
-            }
-          }
-
-          if (room.players.size === 0) {
-            cleanupRoom(roomCode);
-            return;
-          }
-
-          const connected = getConnectedPlayers(room);
-          if (room.phase !== 'lobby' && !room.devMode && connected.length < 2) {
-            io.to(roomCode).emit('game_aborted', {
-              message: 'Not enough players to continue. Returning to lobby.',
-            });
-            resetToLobby(room);
-          } else if (room.phase === 'describing') {
-            if (room.turnOrder[room.currentTurnIndex] === socket.id) {
-              room.turnOrder = room.turnOrder.filter((id) => id !== socket.id);
-              room.currentTurnIndex = Math.min(room.currentTurnIndex, room.turnOrder.length - 1);
-              if (room.turnOrder.length === 0) {
-                startVoting(room);
-              } else {
-                broadcastRoomState(room);
-                announceTurn(room);
-              }
-            } else {
-              room.turnOrder = room.turnOrder.filter((id) => id !== socket.id);
-              broadcastRoomState(room);
-            }
-          } else if (room.phase === 'voting') {
-            room.turnOrder = room.turnOrder.filter((id) => id !== socket.id);
-            checkVotingComplete(room);
-          } else if (room.phase === 'chameleon_guess' && room.chameleonId === socket.id) {
-            resolveGuess(room, null);
-          }
-
-          broadcastRoomState(room);
-        }
-      }
-    }, 30_000);
-  });
-
-  // â”€â”€ RECONNECT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  socket.on('reconnect_player', ({ roomCode, username }, callback) => {
-    const cb = typeof callback === 'function' ? callback : () => {};
-    const code = (roomCode || '').trim().toUpperCase();
-    const room = rooms.get(code);
-    if (!room) return cb({ error: 'Room not found.' });
-
-    let foundId = null;
-    for (const [id, p] of room.players) {
-      if (p.username.toLowerCase() === (username || '').trim().toLowerCase() && !p.connected) {
-        foundId = id;
-        break;
-      }
+    if (room.hostId===socket.id) {
+      room.hostId = [...room.players.keys()][0];
+      io.to(room.code).emit('host_changed',{newHostId:room.hostId});
     }
-
-    if (!foundId) return cb({ error: 'No disconnected player found with that name.' });
-
-    const oldPlayer = room.players.get(foundId);
-    if (oldPlayer.disconnectTimeout) {
-      clearTimeout(oldPlayer.disconnectTimeout);
-      oldPlayer.disconnectTimeout = null;
-    }
-
-    room.players.delete(foundId);
-    const score = room.scores.get(foundId) ?? 0;
-    room.scores.delete(foundId);
-
-    oldPlayer.id = socket.id;
-    oldPlayer.connected = true;
-    room.players.set(socket.id, oldPlayer);
-    room.scores.set(socket.id, score);
-
-    if (room.hostId === foundId) room.hostId = socket.id;
-    if (room.chameleonId === foundId) room.chameleonId = socket.id;
-    room.turnOrder = room.turnOrder.map((id) => (id === foundId ? socket.id : id));
-    if (room.clues.has(foundId)) {
-      const clue = room.clues.get(foundId);
-      room.clues.delete(foundId);
-      room.clues.set(socket.id, clue);
-    }
-    if (room.votes.has(foundId)) {
-      const vote = room.votes.get(foundId);
-      room.votes.delete(foundId);
-      room.votes.set(socket.id, vote);
-    }
-    for (const [voter, suspect] of room.votes) {
-      if (suspect === foundId) room.votes.set(voter, socket.id);
-    }
-
-    socket.join(code);
-    socket.data.roomCode = code;
-    socket.data.username = oldPlayer.username;
-
-    cb({ success: true, roomCode: code, playerId: socket.id, devMode: room.devMode });
-    broadcastRoomState(room);
-    if (room.phase !== 'lobby' && room.phase !== 'reveal') {
-      socket.emit('private_info', privatePlayerInfo(room, socket.id));
-    }
-    io.to(code).emit('player_reconnected', { username: oldPlayer.username });
+    broadcastLobby(room);
   });
 });
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-//  STATIC FILES & SERVER START
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-app.use(express.static(path.join(__dirname, 'public'), {
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.html')) {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    }
-  }
+// ─── 20fps GAME BROADCAST ──────────────────────
+setInterval(()=>{
+  for (const room of rooms.values())
+    if (room.phase==='playing') broadcastGame(room);
+},50);
+
+// ─────────────────────────────────────────────
+//  STATIC & START
+// ─────────────────────────────────────────────
+app.use(express.static(path.join(__dirname,'public'),{
+  setHeaders:(res,fp)=>{ if(fp.endsWith('.html')) res.setHeader('Content-Type','text/html;charset=utf-8'); }
 }));
-
-app.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+app.get('/',(req,res)=>{
+  res.setHeader('Content-Type','text/html;charset=utf-8');
+  res.sendFile(path.join(__dirname,'public','index.html'));
 });
 
-server.listen(PORT, () => {
-  console.log(`\nğŸ¦  Chameleon Game Server running on http://localhost:${PORT}\n`);
-});
+server.listen(PORT,()=>console.log(`\n&#x1F98E;  Meccha Chameleon 3D running on http://localhost:${PORT}\n`));

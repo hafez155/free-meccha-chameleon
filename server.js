@@ -55,9 +55,9 @@ const MAPS = [
       { x:-10,   y:2, z: 17.9, rotY:Math.PI,    w:4, h:4, color:'#356635' },
     ],
     obstacles: [
-      { x:8, z:5, w:2, h:6, d:2 }, { x:-8, z:5, w:2, h:6, d:2 },
-      { x:5, z:-8, w:2, h:6, d:2 }, { x:-5, z:-8, w:2, h:6, d:2 },
-      { x:0, z:0, w:3, h:4.5, d:3 }, { x:10, z:-4, w:2, h:3.5, d:2 },
+      { x:8, z:5, w:2, h:6, d:2, color:'#ef4444' }, { x:-8, z:5, w:2, h:6, d:2, color:'#3b82f6' },
+      { x:5, z:-8, w:2, h:6, d:2, color:'#f59e0b' }, { x:-5, z:-8, w:2, h:6, d:2, color:'#8b5cf6' },
+      { x:0, z:0, w:3, h:4.5, d:3, color:'#22c55e' }, { x:10, z:-4, w:2, h:3.5, d:2, color:'#64748b' },
     ],
   },
   {
@@ -78,9 +78,9 @@ const MAPS = [
       { x:-10,   y:2, z: 17.9, rotY:Math.PI,    w:4, h:4, color:'#bdbd22' },
     ],
     obstacles: [
-      { x:6, z:6, w:2.5, h:3.5, d:2.5 }, { x:-6, z:6, w:2.5, h:3.5, d:2.5 },
-      { x:6, z:-6, w:2.5, h:3.5, d:2.5 }, { x:-6, z:-6, w:2.5, h:3.5, d:2.5 },
-      { x:0, z:0, w:5, h:2, d:5 }, { x:0, z:10, w:2.5, h:2.5, d:2.5 }, { x:0, z:-10, w:2.5, h:2.5, d:2.5 },
+      { x:6, z:6, w:2.5, h:3.5, d:2.5, color:'#f43f5e' }, { x:-6, z:6, w:2.5, h:3.5, d:2.5, color:'#0ea5e9' },
+      { x:6, z:-6, w:2.5, h:3.5, d:2.5, color:'#eab308' }, { x:-6, z:-6, w:2.5, h:3.5, d:2.5, color:'#10b981' },
+      { x:0, z:0, w:5, h:2, d:5, color:'#a855f7' }, { x:0, z:10, w:2.5, h:2.5, d:2.5, color:'#64748b' }, { x:0, z:-10, w:2.5, h:2.5, d:2.5, color:'#cbd5e1' },
     ],
   },
 ];
@@ -113,7 +113,7 @@ function broadcastGame(room) {
       id:p.id, x:p.x, y:p.y, z:p.z, rotY:p.rotY,
       color:p.color, blendLevel:p.blendLevel,
       isChameleon:p.isChameleon, caught:p.caught,
-      username:p.username, hat:p.hat,
+      username:p.username, hat:p.hat, pose:p.pose||'stand',
     })),
     timer: room.timer,
   });
@@ -121,7 +121,7 @@ function broadcastGame(room) {
 
 function startGame(room) {
   const players = [...room.players.values()];
-  const cham = pickRandom(players);
+  const hunter = pickRandom(players);
   const map  = MAPS.find(m=>m.id===room.mapId) || MAPS[0];
 
   const spawns = [
@@ -132,36 +132,48 @@ function startGame(room) {
   players.forEach((p, i) => {
     const sp = spawns[i % spawns.length];
     Object.assign(p, {
-      isChameleon: p.id === cham.id,
+      isChameleon: p.id !== hunter.id,
       caught: false, blendLevel: 0,
-      color: p.id === cham.id ? '#22c55e' : '#3b82f6',
+      color: p.id !== hunter.id ? '#22c55e' : '#ef4444',
       x: sp.x, y: 0.9, z: sp.z, rotY: 0,
+      pose: 'stand'
     });
     const sock = io.sockets.sockets.get(p.id);
     if (sock) sock.emit('role_info', { isChameleon: p.isChameleon, map });
   });
 
-  room.phase      = 'playing';
-  room.timer      = GAME_DURATION;
-  room.chameleonId = cham.id;
+  room.phase      = 'hide_time';
+  room.timer      = 15;
+  room.hunterId   = hunter.id;
 
-  io.to(room.code).emit('game_start', { map, mapId: room.mapId });
+  io.to(room.code).emit('game_start', { map, mapId: room.mapId, phase: room.phase });
   broadcastGame(room);
 
+  if (room.timerInterval) clearInterval(room.timerInterval);
   room.timerInterval = setInterval(() => {
     room.timer = Math.max(0, room.timer - 1);
-    if (room.timer <= 0) { clearInterval(room.timerInterval); room.timerInterval = null; endGame(room,'timeout',null); }
+    
+    if (room.timer <= 0) {
+      if (room.phase === 'hide_time') {
+        room.phase = 'playing';
+        room.timer = GAME_DURATION;
+        io.to(room.code).emit('phase_change', { phase: 'playing' });
+      } else if (room.phase === 'playing') {
+        clearInterval(room.timerInterval); 
+        room.timerInterval = null; 
+        endGame(room, 'timeout', null);
+      }
+    }
   }, 1000);
 }
 
 function endGame(room, reason, catcherId) {
   if (room.timerInterval) { clearInterval(room.timerInterval); room.timerInterval = null; }
   room.phase = 'ended';
-  const cham = room.players.get(room.chameleonId);
   const chameleonWins = reason === 'timeout';
 
   if (chameleonWins) {
-    if (cham) cham.score += 3;
+    for (const p of room.players.values()) if (p.isChameleon) p.score += 3;
   } else {
     for (const p of room.players.values()) if (!p.isChameleon) p.score += 1;
     if (catcherId && room.players.has(catcherId)) room.players.get(catcherId).score += 2;
@@ -169,8 +181,6 @@ function endGame(room, reason, catcherId) {
 
   io.to(room.code).emit('game_end', {
     reason, chameleonWins,
-    chameleonId: room.chameleonId,
-    chameleonName: cham?.username || '?',
     catcherName: catcherId ? room.players.get(catcherId)?.username : null,
     players: [...room.players.values()].map(p=>({id:p.id,username:p.username,score:p.score,isChameleon:p.isChameleon})),
   });
@@ -187,7 +197,7 @@ io.on('connection', socket => {
     const room = { code, hostId:socket.id, phase:'lobby', mapId:mapId||'arcade',
                    players:new Map(), timer:GAME_DURATION, timerInterval:null, chameleonId:null };
     room.players.set(socket.id,{id:socket.id,username:name,ready:false,score:0,
-      x:0,y:0.9,z:0,rotY:0,color:'#3b82f6',blendLevel:0,isChameleon:false,caught:false,hat:''});
+      x:0,y:0.9,z:0,rotY:0,color:'#3b82f6',blendLevel:0,isChameleon:false,caught:false,hat:'',pose:'stand'});
     rooms.set(code,room);
     socket.join(code);
     socket.data.roomCode = code; socket.data.username = name;
@@ -204,7 +214,7 @@ io.on('connection', socket => {
     if (room.phase !== 'lobby') return cb({error:'Game in progress.'});
     if (room.players.size >= 8) return cb({error:'Room full.'});
     room.players.set(socket.id,{id:socket.id,username:name,ready:false,score:0,
-      x:0,y:0.9,z:0,rotY:0,color:'#3b82f6',blendLevel:0,isChameleon:false,caught:false,hat:''});
+      x:0,y:0.9,z:0,rotY:0,color:'#3b82f6',blendLevel:0,isChameleon:false,caught:false,hat:'',pose:'stand'});
     socket.join(code);
     socket.data.roomCode = code; socket.data.username = name;
     cb({success:true,roomCode:code,playerId:socket.id});
@@ -221,6 +231,18 @@ io.on('connection', socket => {
   socket.on('set_map', ({mapId}) => {
     const room = getRoom(socket); if (!room||room.hostId!==socket.id) return;
     if (MAPS.find(m=>m.id===mapId)) { room.mapId = mapId; broadcastLobby(room); }
+  });
+
+  socket.on('player_color', ({color}) => {
+    const room = getRoom(socket); if (!room) return;
+    const p = room.players.get(socket.id); if (!p) return;
+    if (color && /^#[0-9a-fA-F]{6}$/.test(color)) p.color = color;
+  });
+
+  socket.on('player_pose', ({pose}) => {
+    const room = getRoom(socket); if (!room) return;
+    const p = room.players.get(socket.id); if (!p) return;
+    p.pose = pose || 'stand';
   });
 
   socket.on('start_game', cb => {
@@ -253,20 +275,20 @@ io.on('connection', socket => {
   });
 
   socket.on('hunter_click', ({targetId}) => {
-    const room = getRoom(socket); if (!room||room.phase!=='playing') return;
-    const hunter = room.players.get(socket.id);
-    const target = room.players.get(targetId);
-    if (!hunter||!target||hunter.isChameleon||target.caught) return;
-    if (!target.isChameleon) {
-      socket.emit('wrong_guess',{name:target.username});
-      return;
+    const room = getRoom(socket); if (!room) return;
+    const p = room.players.get(socket.id); if (!p||p.isChameleon) return;
+    const tgt = room.players.get(targetId);
+    if (tgt && tgt.isChameleon) {
+      tgt.isChameleon = false;
+      tgt.color = '#ef4444';
+      tgt.pose = 'stand';
+      io.to(room.code).emit('chat_msg',{sys:true,msg:`🚨 ${p.username} caught ${tgt.username}! They are now a Hunter!`});
+      
+      const chams = [...room.players.values()].filter(x => x.isChameleon);
+      if (chams.length === 0) {
+        endGame(room, 'caught', p.id);
+      }
     }
-    target.caught = true;
-    io.to(room.code).emit('player_caught',{
-      caughtId:targetId, caughtName:target.username,
-      catcherId:socket.id, catcherName:hunter.username,
-    });
-    setTimeout(()=>endGame(room,'caught',socket.id),2500);
   });
 
   socket.on('send_chat', ({message}) => {

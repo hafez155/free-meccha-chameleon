@@ -15,72 +15,72 @@ const PORT   = process.env.PORT || 3000;
 // ─────────────────────────────────────────────
 const MAPS = [
   {
-    id: 'arcade', name: 'Arcade', emoji: '🕹️',
-    fogColor: '#0a0018', floorColor: '#08000f', wallColor: '#0d0018',
+    id: 'arcade', name: 'Arcade Arena', emoji: '🕹️',
+    fogColor: '#070b14', floorColor: '#0a0f1d', wallColor: '#080a14',
     panels: [
-      { x:-15.9, y:1.8, z: 0,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#ff0080' },
-      { x:-15.9, y:1.8, z: 9,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#00ffff' },
-      { x:-15.9, y:1.8, z:-9,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#ffff00' },
-      { x: 15.9, y:1.8, z: 0,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#00ff80' },
-      { x: 15.9, y:1.8, z: 9,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#ff8000' },
-      { x: 15.9, y:1.8, z:-9,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#a020f0' },
-      { x: 0,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#ff4040' },
-      { x: 9,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#40ff40' },
-      { x:-9,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#4040ff' },
-      { x: 0,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#ff40ff' },
-      { x: 9,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#40ffff' },
-      { x:-9,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#ffff40' },
+      { x:-17.9, y:2, z: 0,  rotY: Math.PI/2,  w:4, h:4, color:'#ff007f' },
+      { x:-17.9, y:2, z: 10, rotY: Math.PI/2,  w:4, h:4, color:'#00f6ff' },
+      { x:-17.9, y:2, z:-10, rotY: Math.PI/2,  w:4, h:4, color:'#ffea00' },
+      { x: 17.9, y:2, z: 0,  rotY:-Math.PI/2,  w:4, h:4, color:'#00ff66' },
+      { x: 17.9, y:2, z: 10, rotY:-Math.PI/2,  w:4, h:4, color:'#ff8c00' },
+      { x: 17.9, y:2, z:-10, rotY:-Math.PI/2,  w:4, h:4, color:'#9900ff' },
+      { x: 0,    y:2, z:-17.9, rotY:0,          w:4, h:4, color:'#ff3333' },
+      { x: 10,   y:2, z:-17.9, rotY:0,          w:4, h:4, color:'#33ff33' },
+      { x:-10,   y:2, z:-17.9, rotY:0,          w:4, h:4, color:'#3333ff' },
+      { x: 0,    y:2, z: 17.9, rotY:Math.PI,    w:4, h:4, color:'#ff33ff' },
+      { x: 10,   y:2, z: 17.9, rotY:Math.PI,    w:4, h:4, color:'#33ffff' },
+      { x:-10,   y:2, z: 17.9, rotY:Math.PI,    w:4, h:4, color:'#ffff33' },
     ],
     obstacles: [
-      { x:6, z:6, w:2, h:2.5, d:2 }, { x:-6, z:6, w:2, h:2.5, d:2 },
-      { x:6, z:-6, w:2, h:2.5, d:2 }, { x:-6, z:-6, w:2, h:2.5, d:2 },
-      { x:0, z:0, w:3, h:1, d:3 },
+      { x:7, z:7, w:2.5, h:3, d:2.5 }, { x:-7, z:7, w:2.5, h:3, d:2.5 },
+      { x:7, z:-7, w:2.5, h:3, d:2.5 }, { x:-7, z:-7, w:2.5, h:3, d:2.5 },
+      { x:0, z:0, w:4, h:1.2, d:4 },
     ],
   },
   {
-    id: 'forest', name: 'Forest', emoji: '🌲',
-    fogColor: '#051005', floorColor: '#081208', wallColor: '#0a180a',
+    id: 'forest', name: 'Forest Hideout', emoji: '🌲',
+    fogColor: '#040d06', floorColor: '#07150a', wallColor: '#051108',
     panels: [
-      { x:-15.9, y:1.8, z: 0,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#2d7a1b' },
-      { x:-15.9, y:1.8, z: 9,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#7a4a1b' },
-      { x:-15.9, y:1.8, z:-9,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#1b5c1b' },
-      { x: 15.9, y:1.8, z: 0,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#b0901a' },
-      { x: 15.9, y:1.8, z: 9,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#4a8a4a' },
-      { x: 15.9, y:1.8, z:-9,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#8a6030' },
-      { x: 0,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#3a7a3a' },
-      { x: 9,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#6a5020' },
-      { x:-9,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#2a6a2a' },
-      { x: 0,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#5a9a3a' },
-      { x: 9,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#9a6a30' },
-      { x:-9,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#3a6a3a' },
+      { x:-17.9, y:2, z: 0,  rotY: Math.PI/2,  w:4, h:4, color:'#2a751c' },
+      { x:-17.9, y:2, z: 10, rotY: Math.PI/2,  w:4, h:4, color:'#7c4915' },
+      { x:-17.9, y:2, z:-10, rotY: Math.PI/2,  w:4, h:4, color:'#185418' },
+      { x: 17.9, y:2, z: 0,  rotY:-Math.PI/2,  w:4, h:4, color:'#ad8e18' },
+      { x: 17.9, y:2, z: 10, rotY:-Math.PI/2,  w:4, h:4, color:'#448744' },
+      { x: 17.9, y:2, z:-10, rotY:-Math.PI/2,  w:4, h:4, color:'#875d2e' },
+      { x: 0,    y:2, z:-17.9, rotY:0,          w:4, h:4, color:'#357535' },
+      { x: 10,   y:2, z:-17.9, rotY:0,          w:4, h:4, color:'#664d1c' },
+      { x:-10,   y:2, z:-17.9, rotY:0,          w:4, h:4, color:'#256625' },
+      { x: 0,    y:2, z: 17.9, rotY:Math.PI,    w:4, h:4, color:'#559635' },
+      { x: 10,   y:2, z: 17.9, rotY:Math.PI,    w:4, h:4, color:'#96662e' },
+      { x:-10,   y:2, z: 17.9, rotY:Math.PI,    w:4, h:4, color:'#356635' },
     ],
     obstacles: [
-      { x:7, z:4, w:1.5, h:5, d:1.5 }, { x:-7, z:4, w:1.5, h:5, d:1.5 },
-      { x:4, z:-7, w:1.5, h:5, d:1.5 }, { x:-4, z:-7, w:1.5, h:5, d:1.5 },
-      { x:0, z:0, w:2, h:4, d:2 }, { x:9, z:-3, w:1.5, h:3, d:1.5 },
+      { x:8, z:5, w:2, h:6, d:2 }, { x:-8, z:5, w:2, h:6, d:2 },
+      { x:5, z:-8, w:2, h:6, d:2 }, { x:-5, z:-8, w:2, h:6, d:2 },
+      { x:0, z:0, w:3, h:4.5, d:3 }, { x:10, z:-4, w:2, h:3.5, d:2 },
     ],
   },
   {
-    id: 'space', name: 'Space Station', emoji: '🚀',
-    fogColor: '#000008', floorColor: '#05050f', wallColor: '#080818',
+    id: 'space', name: 'Space Base', emoji: '🚀',
+    fogColor: '#01020a', floorColor: '#040614', wallColor: '#06081c',
     panels: [
-      { x:-15.9, y:1.8, z: 0,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#1a1a8a' },
-      { x:-15.9, y:1.8, z: 9,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#8a1a8a' },
-      { x:-15.9, y:1.8, z:-9,  rotY: Math.PI/2,  w:3.5, h:3.5, color:'#1a8a8a' },
-      { x: 15.9, y:1.8, z: 0,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#5a5aaa' },
-      { x: 15.9, y:1.8, z: 9,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#aa1a5a' },
-      { x: 15.9, y:1.8, z:-9,  rotY:-Math.PI/2,  w:3.5, h:3.5, color:'#1aaa5a' },
-      { x: 0,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#6a2aaa' },
-      { x: 9,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#aa6a1a' },
-      { x:-9,    y:1.8, z:-15.9, rotY:0,          w:3.5, h:3.5, color:'#2aaaaa' },
-      { x: 0,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#aa2aaa' },
-      { x: 9,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#2a6aaa' },
-      { x:-9,    y:1.8, z: 15.9, rotY:Math.PI,    w:3.5, h:3.5, color:'#aaaa2a' },
+      { x:-17.9, y:2, z: 0,  rotY: Math.PI/2,  w:4, h:4, color:'#14149c' },
+      { x:-17.9, y:2, z: 10, rotY: Math.PI/2,  w:4, h:4, color:'#9c149c' },
+      { x:-17.9, y:2, z:-10, rotY: Math.PI/2,  w:4, h:4, color:'#149c9c' },
+      { x: 17.9, y:2, z: 0,  rotY:-Math.PI/2,  w:4, h:4, color:'#5555bd' },
+      { x: 17.9, y:2, z: 10, rotY:-Math.PI/2,  w:4, h:4, color:'#bd1455' },
+      { x: 17.9, y:2, z:-10, rotY:-Math.PI/2,  w:4, h:4, color:'#14bd55' },
+      { x: 0,    y:2, z:-17.9, rotY:0,          w:4, h:4, color:'#6622bd' },
+      { x: 10,   y:2, z:-17.9, rotY:0,          w:4, h:4, color:'#bd6614' },
+      { x:-10,   y:2, z:-17.9, rotY:0,          w:4, h:4, color:'#22bdbd' },
+      { x: 0,    y:2, z: 17.9, rotY:Math.PI,    w:4, h:4, color:'#bd22bd' },
+      { x: 10,   y:2, z: 17.9, rotY:Math.PI,    w:4, h:4, color:'#2266bd' },
+      { x:-10,   y:2, z: 17.9, rotY:Math.PI,    w:4, h:4, color:'#bdbd22' },
     ],
     obstacles: [
-      { x:5, z:5, w:2, h:3, d:2 }, { x:-5, z:5, w:2, h:3, d:2 },
-      { x:5, z:-5, w:2, h:3, d:2 }, { x:-5, z:-5, w:2, h:3, d:2 },
-      { x:0, z:0, w:4, h:1.5, d:4 }, { x:0, z:9, w:2, h:2, d:2 }, { x:0, z:-9, w:2, h:2, d:2 },
+      { x:6, z:6, w:2.5, h:3.5, d:2.5 }, { x:-6, z:6, w:2.5, h:3.5, d:2.5 },
+      { x:6, z:-6, w:2.5, h:3.5, d:2.5 }, { x:-6, z:-6, w:2.5, h:3.5, d:2.5 },
+      { x:0, z:0, w:5, h:2, d:5 }, { x:0, z:10, w:2.5, h:2.5, d:2.5 }, { x:0, z:-10, w:2.5, h:2.5, d:2.5 },
     ],
   },
 ];
@@ -88,9 +88,6 @@ const MAPS = [
 const GAME_DURATION = 90;
 const rooms = new Map();
 
-// ─────────────────────────────────────────────
-//  HELPERS
-// ─────────────────────────────────────────────
 function generateCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
   let code;
@@ -105,7 +102,7 @@ function broadcastLobby(room) {
   io.to(room.code).emit('lobby_state', {
     code: room.code, hostId: room.hostId, mapId: room.mapId,
     players: [...room.players.values()].map(p => ({
-      id:p.id, username:p.username, ready:p.ready, score:p.score,
+      id:p.id, username:p.username, ready:p.ready, score:p.score, hat:p.hat,
     })),
   });
 }
@@ -116,7 +113,7 @@ function broadcastGame(room) {
       id:p.id, x:p.x, y:p.y, z:p.z, rotY:p.rotY,
       color:p.color, blendLevel:p.blendLevel,
       isChameleon:p.isChameleon, caught:p.caught,
-      username:p.username,
+      username:p.username, hat:p.hat,
     })),
     timer: room.timer,
   });
@@ -128,8 +125,8 @@ function startGame(room) {
   const map  = MAPS.find(m=>m.id===room.mapId) || MAPS[0];
 
   const spawns = [
-    {x:0,z:0},{x:5,z:5},{x:-5,z:5},{x:5,z:-5},{x:-5,z:-5},
-    {x:0,z:8},{x:8,z:0},{x:-8,z:0},
+    {x:0,z:0},{x:6,z:6},{x:-6,z:6},{x:6,z:-6},{x:-6,z:-6},
+    {x:0,z:10},{x:10,z:0},{x:-10,z:0},
   ];
 
   players.forEach((p, i) => {
@@ -137,7 +134,7 @@ function startGame(room) {
     Object.assign(p, {
       isChameleon: p.id === cham.id,
       caught: false, blendLevel: 0,
-      color: p.id === cham.id ? '#22c55e' : '#60a5fa',
+      color: p.id === cham.id ? '#22c55e' : '#3b82f6',
       x: sp.x, y: 0.9, z: sp.z, rotY: 0,
     });
     const sock = io.sockets.sockets.get(p.id);
@@ -180,7 +177,7 @@ function endGame(room, reason, catcherId) {
 }
 
 // ─────────────────────────────────────────────
-//  SOCKET HANDLERS
+//  SOCKET CLIENT EVENT REGISTRY
 // ─────────────────────────────────────────────
 io.on('connection', socket => {
   socket.on('create_room', ({username, mapId}, cb) => {
@@ -190,7 +187,7 @@ io.on('connection', socket => {
     const room = { code, hostId:socket.id, phase:'lobby', mapId:mapId||'arcade',
                    players:new Map(), timer:GAME_DURATION, timerInterval:null, chameleonId:null };
     room.players.set(socket.id,{id:socket.id,username:name,ready:false,score:0,
-      x:0,y:0.9,z:0,rotY:0,color:'#60a5fa',blendLevel:0,isChameleon:false,caught:false});
+      x:0,y:0.9,z:0,rotY:0,color:'#3b82f6',blendLevel:0,isChameleon:false,caught:false,hat:''});
     rooms.set(code,room);
     socket.join(code);
     socket.data.roomCode = code; socket.data.username = name;
@@ -207,7 +204,7 @@ io.on('connection', socket => {
     if (room.phase !== 'lobby') return cb({error:'Game in progress.'});
     if (room.players.size >= 8) return cb({error:'Room full.'});
     room.players.set(socket.id,{id:socket.id,username:name,ready:false,score:0,
-      x:0,y:0.9,z:0,rotY:0,color:'#60a5fa',blendLevel:0,isChameleon:false,caught:false});
+      x:0,y:0.9,z:0,rotY:0,color:'#3b82f6',blendLevel:0,isChameleon:false,caught:false,hat:''});
     socket.join(code);
     socket.data.roomCode = code; socket.data.username = name;
     cb({success:true,roomCode:code,playerId:socket.id});
@@ -236,9 +233,16 @@ io.on('connection', socket => {
   });
 
   socket.on('player_move', data => {
-    const room = getRoom(socket); if (!room||room.phase!=='playing') return;
+    const room = getRoom(socket); if (!room) return;
     const p = room.players.get(socket.id); if (!p||p.caught) return;
-    p.x=data.x; p.y=data.y; p.z=data.z; p.rotY=data.rotY;
+    if (data.x !== undefined) p.x = data.x;
+    if (data.y !== undefined) p.y = data.y;
+    if (data.z !== undefined) p.z = data.z;
+    if (data.rotY !== undefined) p.rotY = data.rotY;
+    if (data.hat !== undefined) {
+      p.hat = data.hat;
+      if (room.phase === 'lobby') broadcastLobby(room);
+    }
   });
 
   socket.on('chameleon_blend', ({blendLevel,color}) => {
@@ -278,7 +282,7 @@ io.on('connection', socket => {
     if (!room||room.hostId!==socket.id||room.phase!=='ended') return c({error:'Cannot restart.'});
     room.phase='lobby'; room.timer=GAME_DURATION; room.chameleonId=null;
     for (const p of room.players.values()) {
-      p.ready=false; p.isChameleon=false; p.caught=false; p.blendLevel=0; p.color='#60a5fa';
+      p.ready=false; p.isChameleon=false; p.caught=false; p.blendLevel=0; p.color='#3b82f6';
     }
     io.to(room.code).emit('return_lobby');
     broadcastLobby(room); c({success:true});
@@ -301,15 +305,13 @@ io.on('connection', socket => {
   });
 });
 
-// ─── 20fps GAME BROADCAST ──────────────────────
+// 20hz TICK
 setInterval(()=>{
   for (const room of rooms.values())
     if (room.phase==='playing') broadcastGame(room);
 },50);
 
-// ─────────────────────────────────────────────
-//  STATIC & START
-// ─────────────────────────────────────────────
+// STATIC FILES
 app.use(express.static(path.join(__dirname,'public'),{
   setHeaders:(res,fp)=>{ if(fp.endsWith('.html')) res.setHeader('Content-Type','text/html;charset=utf-8'); }
 }));
@@ -318,4 +320,4 @@ app.get('/',(req,res)=>{
   res.sendFile(path.join(__dirname,'public','index.html'));
 });
 
-server.listen(PORT,()=>console.log(`\n&#x1F98E;  Meccha Chameleon 3D running on http://localhost:${PORT}\n`));
+server.listen(PORT,()=>console.log(`\n&#x1F98E; Meccha Chameleon 3D on http://localhost:${PORT}\n`));
